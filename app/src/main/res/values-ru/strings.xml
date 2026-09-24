@@ -1,0 +1,158 @@
+<resources>
+    <string name="widget_label">Challenger — сегодня</string>
+    <string name="widget_description">Челленджи на сегодня с отметкой в один тап</string>
+
+    <string name="tab_today">Сегодня</string>
+    <string name="tab_challenges">Челленджи</string>
+    <string name="tab_settings">Настройки</string>
+
+    <string name="category_sport">Спорт</string>
+    <string name="category_study">Учёба</string>
+    <string name="category_other">Своё</string>
+
+    <string name="priority_must">Обязательно</string>
+    <string name="priority_normal">Желательно</string>
+    <string name="priority_optional">Если получится</string>
+    <string name="priority_must_short">must</string>
+    <string name="priority_normal_short">норма</string>
+    <string name="priority_optional_short">опц.</string>
+
+    <string name="schedule_every_day">Каждый день</string>
+    <string name="schedule_every_other_day">Через день</string>
+    <string name="schedule_weekdays">По дням недели</string>
+    <string name="schedule_workdays">по будням</string>
+    <string name="schedule_weekend">по выходным</string>
+    <string name="schedule_all_days">каждый день</string>
+    <string name="schedule_no_days">дни не выбраны</string>
+
+    <string name="unit_reps">раз</string>
+    <string name="unit_sets">подх.</string>
+    <string name="unit_minutes">мин</string>
+    <string name="unit_km">км</string>
+    <string name="unit_pages">стр.</string>
+    <string name="unit_pieces">шт.</string>
+
+    <string name="preset_pushups">Отжимания</string>
+    <string name="preset_pullups">Подтягивания</string>
+    <string name="preset_barbell">Штанга</string>
+    <string name="preset_abs">Пресс</string>
+    <string name="preset_squats">Приседания</string>
+    <string name="preset_running">Бег</string>
+    <string name="preset_walk">Прогулка</string>
+    <string name="preset_english">Английский</string>
+    <string name="preset_spanish">Испанский</string>
+    <string name="preset_it">IT</string>
+
+    <string name="duration_forever">Бессрочно</string>
+    <string name="reminders_none">Без напоминаний</string>
+    <plurals name="days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дня</item>
+    </plurals>
+    <string name="done_of_total">Выполнено %1$d из %2$d</string>
+    <string name="day_x_of_y">день %1$d из %2$d</string>
+    <string name="back">Назад</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Изменить</string>
+    <string name="done_mark">Выполнено</string>
+    <string name="today_nothing_planned">На сегодня ничего не запланировано</string>
+    <string name="today_all_done">Всё сделано. Так держать</string>
+    <string name="today_must_left">Осталось обязательных: %d</string>
+    <string name="today_must_clear">Обязательное закрыто, остальное по желанию</string>
+    <string name="today_section_must">Обязательно</string>
+    <string name="today_section_rest">Остальное</string>
+    <string name="today_free_day">Сегодня свободный день</string>
+    <string name="today_free_day_hint">Настройте челлендж один раз, дальше приложение напомнит само</string>
+    <string name="today_pick_challenge">Выбрать челлендж</string>
+
+    <string name="challenges_custom">Свой челлендж</string>
+    <string name="challenges_empty">Пока пусто. Нажмите «Свой челлендж» внизу</string>
+    <string name="challenges_archived">В архиве</string>
+
+    <string name="editor_new">Новый челлендж</string>
+    <string name="editor_edit">Настройка</string>
+    <string name="editor_title">Название</string>
+    <string name="editor_title_hint">Например, Отжимания</string>
+    <string name="editor_icon">Значок</string>
+    <string name="editor_category">Раздел</string>
+    <string name="editor_priority">Приоритет</string>
+    <string name="editor_priority_hint">Обязательное подсвечивается красным и напоминает настойчивее. Пропуск необязательного серию не рвёт</string>
+    <string name="editor_goal">Цель на день</string>
+    <string name="editor_goal_hint">0 — просто отметка о выполнении</string>
+    <string name="editor_schedule">График</string>
+    <string name="editor_duration">Срок</string>
+    <string name="editor_duration_label">Дней</string>
+    <string name="editor_duration_hint">0 — бессрочно</string>
+    <string name="editor_duration_forever">Бессрочно</string>
+    <string name="editor_duration_days">%d дн.</string>
+    <string name="editor_reminders">Напоминания</string>
+    <string name="editor_reminders_hint">Напоминать в шторке, с кнопкой «Выполнил»</string>
+    <string name="editor_add_time">+ время</string>
+    <string name="editor_create">Создать челлендж</string>
+    <string name="editor_save">Сохранить</string>
+    <string name="editor_time_title">Время напоминания</string>
+    <string name="editor_time_add">Добавить</string>
+    <string name="editor_time_cancel">Отмена</string>
+    <string name="editor_time_keyboard">Ввести с клавиатуры</string>
+    <string name="editor_time_dial">Циферблат</string>
+
+    <string name="stats_challenge">Челлендж</string>
+    <string name="stats_streak">Серия</string>
+    <string name="stats_best">Рекорд</string>
+    <string name="stats_rate">Успех</string>
+    <string name="stats_mark_done">Отметить выполнение</string>
+    <string name="stats_unmark">Снять отметку за сегодня</string>
+    <string name="stats_rest_day">Сегодня по графику выходной</string>
+    <string name="stats_last_weeks">Последние 12 недель</string>
+    <string name="stats_legend_done">сделано</string>
+    <string name="stats_legend_missed">пропуск</string>
+    <string name="stats_legend_today">сегодня</string>
+    <string name="stats_archive">В архив</string>
+    <string name="stats_unarchive">Вернуть из архива</string>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_notifications">Уведомления</string>
+    <string name="settings_notifications_on">Включены</string>
+    <string name="settings_notifications_off">Выключены — напоминания не придут</string>
+    <string name="settings_open">Открыть настройки</string>
+    <string name="settings_exact">Точное время напоминаний</string>
+    <string name="settings_exact_on">Разрешено, напомним минута в минуту</string>
+    <string name="settings_exact_off">Не разрешено — система может сдвинуть напоминание</string>
+    <string name="settings_allow">Разрешить</string>
+    <string name="settings_battery">Работа в фоне</string>
+    <string name="settings_battery_hint">Если напоминания пропадают, отключите экономию батареи для Challenger</string>
+    <string name="settings_battery_open">Открыть настройки батареи</string>
+    <string name="settings_widget">Виджет на рабочий стол</string>
+    <string name="settings_widget_hint">Список дел на сегодня с галочками, без захода в приложение</string>
+    <string name="settings_widget_add">Добавить виджет</string>
+    <string name="settings_about">Challenger 1.0 — всё хранится на телефоне, аккаунт и интернет не нужны</string>
+
+    <string name="channel_must_name">Обязательные челленджи</string>
+    <string name="channel_must_desc">Напоминания о том, что пропускать нельзя</string>
+    <string name="channel_normal_name">Обычные челленджи</string>
+    <string name="channel_normal_desc">Напоминания, которые не критично пропустить</string>
+    <string name="notif_goal">Цель: %1$d %2$s</string>
+    <string name="notif_time_to">Пора сделать</string>
+    <string name="notif_must_prefix">Обязательно. </string>
+    <string name="notif_action_done">Выполнил</string>
+    <string name="notif_action_snooze">Через час</string>
+
+    <string name="widget_today">Сегодня</string>
+    <string name="widget_empty">На сегодня ничего не запланировано</string>
+    <string name="companion_sad">День уходит. Может, начнём?</string>
+    <string name="companion_bored">Жду, когда начнёшь</string>
+    <string name="companion_interested">Уже лучше. Продолжай</string>
+    <string name="companion_happy">Всё важное закрыто. Молодец</string>
+    <string name="companion_celebrating">Весь день закрыт. Танцуем</string>
+
+    <string name="settings_companion">Спутница</string>
+    <string name="settings_companion_hint">Пока день не закрыт — она ждёт, с каждой галочкой настроение растёт</string>
+    <string name="settings_companion_show">Показывать на экране «Сегодня»</string>
+    <string name="settings_companion_style">Образ</string>
+    <string name="settings_companion_opacity">Заметность</string>
+    <string name="settings_companion_no_packs">Графика ещё не добавлена — работает встроенная заглушка. Положите пак в assets/companion</string>
+</resources>
+
+
+

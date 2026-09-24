@@ -1,0 +1,172 @@
+<resources>
+    <string name="app_name">Challenger</string>
+    <string name="widget_label">Challenger — Today</string>
+    <string name="widget_description">Today\'s challenges, one tap to tick off</string>
+
+    <!-- Tabs -->
+    <string name="tab_today">Today</string>
+    <string name="tab_challenges">Challenges</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Categories -->
+    <string name="category_sport">Sport</string>
+    <string name="category_study">Study</string>
+    <string name="category_other">Custom</string>
+
+    <!-- Priority -->
+    <string name="priority_must">Must do</string>
+    <string name="priority_normal">Should do</string>
+    <string name="priority_optional">Nice to have</string>
+    <string name="priority_must_short">must</string>
+    <string name="priority_normal_short">normal</string>
+    <string name="priority_optional_short">opt.</string>
+
+    <!-- Schedule -->
+    <string name="schedule_every_day">Every day</string>
+    <string name="schedule_every_other_day">Every other day</string>
+    <string name="schedule_weekdays">Chosen weekdays</string>
+    <string name="schedule_workdays">on weekdays</string>
+    <string name="schedule_weekend">on weekends</string>
+    <string name="schedule_all_days">every day</string>
+    <string name="schedule_no_days">no days chosen</string>
+
+    <!-- Units -->
+    <string name="unit_reps">reps</string>
+    <string name="unit_sets">sets</string>
+    <string name="unit_minutes">min</string>
+    <string name="unit_km">km</string>
+    <string name="unit_pages">pages</string>
+    <string name="unit_pieces">pcs</string>
+
+    <!-- Preset challenges -->
+    <string name="preset_pushups">Push-ups</string>
+    <string name="preset_pullups">Pull-ups</string>
+    <string name="preset_barbell">Barbell</string>
+    <string name="preset_abs">Abs</string>
+    <string name="preset_squats">Squats</string>
+    <string name="preset_running">Running</string>
+    <string name="preset_walk">Walk</string>
+    <string name="preset_english">English</string>
+    <string name="preset_spanish">Spanish</string>
+    <string name="preset_it">IT</string>
+
+    <!-- Common -->
+    <string name="duration_forever">No end date</string>
+    <string name="reminders_none">No reminders</string>
+    <plurals name="days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="done_of_total">%1$d of %2$d done</string>
+    <string name="day_x_of_y">day %1$d of %2$d</string>
+    <string name="back">Back</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="done_mark">Done</string>
+    <!-- Today screen -->
+    <string name="today_nothing_planned">Nothing planned for today</string>
+    <string name="today_all_done">All done. Keep it up</string>
+    <string name="today_must_left">Must-do left: %d</string>
+    <string name="today_must_clear">Must-do is closed, the rest is up to you</string>
+    <string name="today_section_must">Must do</string>
+    <string name="today_section_rest">Everything else</string>
+    <string name="today_free_day">A free day today</string>
+    <string name="today_free_day_hint">Set a challenge up once, the app reminds you from then on</string>
+    <string name="today_pick_challenge">Pick a challenge</string>
+
+    <!-- Challenges screen -->
+    <string name="challenges_custom">Custom challenge</string>
+    <string name="challenges_empty">Nothing here yet. Tap "Custom challenge" below</string>
+    <string name="challenges_archived">Archived</string>
+
+    <!-- Editor -->
+    <string name="editor_new">New challenge</string>
+    <string name="editor_edit">Settings</string>
+    <string name="editor_title">Name</string>
+    <string name="editor_title_hint">Push-ups, for example</string>
+    <string name="editor_icon">Icon</string>
+    <string name="editor_category">Section</string>
+    <string name="editor_priority">Priority</string>
+    <string name="editor_priority_hint">Must-do is highlighted in red and reminds you more insistently. Missing a nice-to-have does not break the streak</string>
+    <string name="editor_goal">Daily goal</string>
+    <string name="editor_goal_hint">0 — just tick it off</string>
+    <string name="editor_schedule">Schedule</string>
+    <string name="editor_duration">Duration</string>
+    <string name="editor_duration_label">Days</string>
+    <string name="editor_duration_hint">0 — no end date</string>
+    <string name="editor_duration_forever">No end</string>
+    <string name="editor_duration_days">%d d.</string>
+    <string name="editor_reminders">Reminders</string>
+    <string name="editor_reminders_hint">Remind me in the shade, with a "Done" button</string>
+    <string name="editor_add_time">+ time</string>
+    <string name="editor_create">Create challenge</string>
+    <string name="editor_save">Save</string>
+    <string name="editor_time_title">Reminder time</string>
+    <string name="editor_time_add">Add</string>
+    <string name="editor_time_cancel">Cancel</string>
+    <string name="editor_time_keyboard">Type it in</string>
+    <string name="editor_time_dial">Clock face</string>
+
+    <!-- Stats -->
+    <string name="stats_challenge">Challenge</string>
+    <string name="stats_streak">Streak</string>
+    <string name="stats_best">Best</string>
+    <string name="stats_rate">Success</string>
+    <string name="stats_mark_done">Mark as done</string>
+    <string name="stats_unmark">Undo today\'s tick</string>
+    <string name="stats_rest_day">A rest day by your schedule</string>
+    <string name="stats_last_weeks">Last 12 weeks</string>
+    <string name="stats_legend_done">done</string>
+    <string name="stats_legend_missed">missed</string>
+    <string name="stats_legend_today">today</string>
+    <string name="stats_archive">Archive</string>
+    <string name="stats_unarchive">Restore from archive</string>
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_on">Enabled</string>
+    <string name="settings_notifications_off">Disabled — reminders will not arrive</string>
+    <string name="settings_open">Open settings</string>
+    <string name="settings_exact">Exact reminder time</string>
+    <string name="settings_exact_on">Allowed, you will be reminded to the minute</string>
+    <string name="settings_exact_off">Not allowed — the system may shift the reminder</string>
+    <string name="settings_allow">Allow</string>
+    <string name="settings_battery">Background work</string>
+    <string name="settings_battery_hint">If reminders go missing, turn battery saving off for Challenger</string>
+    <string name="settings_battery_open">Open battery settings</string>
+    <string name="settings_widget">Home screen widget</string>
+    <string name="settings_widget_hint">Today\'s list with checkboxes, no need to open the app</string>
+    <string name="settings_widget_add">Add widget</string>
+    <string name="settings_about">Challenger 1.0 — everything stays on your phone, no account, no internet</string>
+
+    <!-- Notifications -->
+    <string name="channel_must_name">Must-do challenges</string>
+    <string name="channel_must_desc">Reminders you should not skip</string>
+    <string name="channel_normal_name">Regular challenges</string>
+    <string name="channel_normal_desc">Reminders it is fine to miss</string>
+    <string name="notif_goal">Goal: %1$d %2$s</string>
+    <string name="notif_time_to">Time to do it</string>
+    <string name="notif_must_prefix">Must do. </string>
+    <string name="notif_action_done">Done</string>
+    <string name="notif_action_snooze">In an hour</string>
+
+    <!-- Widget -->
+    <string name="widget_today">Today</string>
+    <string name="widget_empty">Nothing planned for today</string>
+    <!-- Companion -->
+    <string name="companion_sad">The day is slipping away. Shall we start?</string>
+    <string name="companion_bored">Waiting for you to begin</string>
+    <string name="companion_interested">That is better. Keep going</string>
+    <string name="companion_happy">Everything that matters is done. Nice work</string>
+    <string name="companion_celebrating">The whole day is closed. Time to dance</string>
+
+    <string name="settings_companion">Companion</string>
+    <string name="settings_companion_hint">She waits while the day is open and cheers up as you tick things off</string>
+    <string name="settings_companion_show">Show on the Today screen</string>
+    <string name="settings_companion_style">Look</string>
+    <string name="settings_companion_opacity">Visibility</string>
+    <string name="settings_companion_no_packs">No artwork installed yet — the built-in stand-in is used. Drop a pack into assets/companion</string>
+</resources>
+
+
+

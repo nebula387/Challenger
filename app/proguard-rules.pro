@@ -1,0 +1,2 @@
+-keep class com.challenger.app.data.model.** { *; }
+-keepclassmembers class * extends androidx.room.RoomDatabase { <init>(); }
