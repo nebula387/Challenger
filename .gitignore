@@ -8,3 +8,9 @@ captures/
 .externalNativeBuild
 .cxx
 *.apk
+
+# Ключ подписи и пароли: держим вне репозитория
+keystore/
+keystore.properties
+*.jks
+*.keystore

@@ -70,6 +70,27 @@ never drift apart.
 
 Needs JDK 17+ and Android SDK 35. The SDK path goes in `local.properties`.
 
+### Release build
+
+`assembleRelease` signs the APK when a `keystore.properties` sits next to
+`settings.gradle.kts`:
+
+```properties
+storeFile=keystore/challenger-release.jks
+storePassword=...
+keyAlias=challenger
+keyPassword=...
+```
+
+Both that file and the keystore itself are git-ignored — keep a backup
+somewhere safe, because Android will refuse to update an installed app that was
+signed with a different key. Without the file the project still builds; the
+release APK just comes out unsigned.
+
+```bash
+./gradlew :app:assembleRelease      # app/build/outputs/apk/release/app-release.apk
+```
+
 ## On a real phone
 
 1. Allow notifications and exact alarms — both are offered on the Settings screen.
