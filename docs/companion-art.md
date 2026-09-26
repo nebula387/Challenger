@@ -58,6 +58,22 @@ trimmed on anything wider than the phone.
 Both modes need a transparent background, and both are fine with the same five
 moods — only the framing differs.
 
+### Framing the renders for you
+
+Generators paint at their own comfortable resolution, which is never the shape
+of a phone screen. SDXL, for instance, works best around one megapixel —
+832x1216 for a 2:3 portrait. Render there, cut the background out, then let the
+helper do the framing:
+
+```bash
+python tools/prepare_companion.py renders/ --mode bottom
+python tools/prepare_companion.py renders/ --mode full
+```
+
+It trims the transparent margin, scales the figure and places it on the canvas
+the placement wants, then writes WebP straight into the pack folder. Name the
+input files after the moods: `sad`, `idle`, `smile`, `happy`, `dance`.
+
 ## Moods
 
 | Mood | When it shows |
