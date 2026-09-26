@@ -51,6 +51,10 @@ data class CompanionPack(
             .firstOrNull { exists(context, it) }
     }
 
+    /** Есть ли в паке хоть один файл, который реально лежит в assets. */
+    fun hasAnyFrame(context: Context): Boolean =
+        CompanionMood.entries.any { assetFor(context, it, emptyMap()) != null }
+
     /** Нет кадра для настроения — берём ближайшее по смыслу. */
     private fun fallbackMood(mood: CompanionMood): CompanionMood = when (mood) {
         CompanionMood.SAD -> CompanionMood.BORED
@@ -72,12 +76,16 @@ object CompanionPacks {
 
     private const val TAG = "CompanionPacks"
 
-    /** Все паки, найденные в assets/companion. Пустой список — рисуем встроенную заглушку. */
+    /**
+     * Паки, у которых есть хотя бы один настоящий кадр. Папку с одним pack.json
+     * и без картинок не показываем: иначе настройки врут, что графика уже есть.
+     */
     fun available(context: Context): List<CompanionPack> =
         runCatching {
             context.assets.list(CompanionPack.ASSET_ROOT)
                 .orEmpty()
                 .mapNotNull { load(context, it) }
+                .filter { pack -> pack.hasAnyFrame(context) }
         }.getOrElse {
             Log.w(TAG, "Не удалось прочитать паки спутницы", it)
             emptyList()

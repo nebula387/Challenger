@@ -1,0 +1,10 @@
+{
+  "name": "Ann",
+  "frames": {
+    "SAD": "sad.webp",
+    "BORED": "idle.webp",
+    "INTERESTED": "smile.webp",
+    "HAPPY": "happy.webp",
+    "CELEBRATING": "dance.webp"
+  }
+}
