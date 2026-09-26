@@ -152,6 +152,9 @@
     <string name="settings_companion_style">Образ</string>
     <string name="settings_companion_opacity">Заметность</string>
     <string name="settings_companion_no_packs">Графика ещё не добавлена — работает встроенная заглушка. Положите пак в assets/companion</string>
+    <string name="settings_companion_placement">Расположение</string>
+    <string name="settings_companion_bottom">Снизу</string>
+    <string name="settings_companion_fullscreen">На весь экран</string>
 </resources>
 
 

@@ -37,6 +37,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     fun setEnabled(value: Boolean) = viewModelScope.launch { prefs.setEnabled(value) }
     fun setPack(id: String) = viewModelScope.launch { prefs.setPack(id) }
     fun setOpacity(value: Float) = viewModelScope.launch { prefs.setOpacity(value) }
+    fun setFullScreen(value: Boolean) = viewModelScope.launch { prefs.setFullScreen(value) }
     fun setOption(name: String, value: String) =
         viewModelScope.launch { prefs.setOption(name, value) }
 }

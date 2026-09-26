@@ -37,7 +37,8 @@ fun CompanionSettingsCard(
     onEnabled: (Boolean) -> Unit,
     onPack: (String) -> Unit,
     onOption: (String, String) -> Unit,
-    onOpacity: (Float) -> Unit
+    onOpacity: (Float) -> Unit,
+    onFullScreen: (Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -102,6 +103,21 @@ fun CompanionSettingsCard(
                         )
                     }
                 }
+            }
+
+            Spacer(Modifier.height(10.dp))
+            Label(stringResource(R.string.settings_companion_placement))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(
+                    selected = !settings.fullScreen,
+                    onClick = { onFullScreen(false) },
+                    label = { Text(stringResource(R.string.settings_companion_bottom)) }
+                )
+                FilterChip(
+                    selected = settings.fullScreen,
+                    onClick = { onFullScreen(true) },
+                    label = { Text(stringResource(R.string.settings_companion_fullscreen)) }
+                )
             }
 
             Spacer(Modifier.height(10.dp))

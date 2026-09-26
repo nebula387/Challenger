@@ -18,7 +18,9 @@ data class CompanionSettings(
     val hair: String = "",
     val outfit: String = "",
     val body: String = "",
-    val opacity: Float = 1f
+    val opacity: Float = 1f,
+    /** Во весь экран фоном или спокойно в нижней части. */
+    val fullScreen: Boolean = false
 ) {
     companion object {
         const val DEFAULT_PACK = "default"
@@ -40,6 +42,7 @@ class CompanionPrefs(private val context: Context) {
     private val keyOutfit = stringPreferencesKey("outfit")
     private val keyBody = stringPreferencesKey("body")
     private val keyOpacity = floatPreferencesKey("opacity")
+    private val keyFullScreen = booleanPreferencesKey("full_screen")
 
     val settings: Flow<CompanionSettings> = context.companionStore.data.map { prefs ->
         CompanionSettings(
@@ -48,7 +51,8 @@ class CompanionPrefs(private val context: Context) {
             hair = prefs[keyHair].orEmpty(),
             outfit = prefs[keyOutfit].orEmpty(),
             body = prefs[keyBody].orEmpty(),
-            opacity = prefs[keyOpacity] ?: 1f
+            opacity = prefs[keyOpacity] ?: 1f,
+            fullScreen = prefs[keyFullScreen] ?: false
         )
     }
 
@@ -57,6 +61,9 @@ class CompanionPrefs(private val context: Context) {
 
     suspend fun setPack(value: String) =
         context.companionStore.edit { it[keyPack] = value }.let { }
+
+    suspend fun setFullScreen(value: Boolean) =
+        context.companionStore.edit { it[keyFullScreen] = value }.let { }
 
     suspend fun setOpacity(value: Float) =
         context.companionStore.edit { it[keyOpacity] = value.coerceIn(0.15f, 1f) }.let { }

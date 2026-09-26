@@ -65,7 +65,9 @@ data class CompanionPack(
 
     companion object {
         const val ASSET_ROOT = "companion"
-        private val PLACEHOLDER = Regex("""\{(\w+)}""")
+        // На Android регулярки строже, чем на JVM: закрывающую скобку
+        // обязательно экранировать, иначе PatternSyntaxException при загрузке класса.
+        private val PLACEHOLDER = Regex("""\{(\w+)\}""")
 
         private fun exists(context: Context, path: String): Boolean =
             runCatching { context.assets.open(path).close(); true }.getOrDefault(false)

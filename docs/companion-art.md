@@ -35,6 +35,29 @@ any artwork exists. To replace it, drop an art pack into
 - A missing mood falls back to the closest one, a missing file falls back to
   the built-in stand-in — a partial pack never crashes the screen.
 
+## Placement and image size
+
+Settings offers two placements, and they want different artwork.
+
+**Bottom** (default) — she stands in the lower 55% of the screen, the whole
+frame is fitted, nothing is cropped.
+
+- 1024 x 1536, portrait 2:3
+- the figure fills the frame, feet right at the bottom edge, no wide margins
+
+**Full screen** — she becomes the background. The image is scaled to cover the
+whole screen and anchored to the bottom, so the left and right edges get
+trimmed on anything wider than the phone.
+
+- 1080 x 2400, portrait 9:20, or anything taller than 2:3
+- keep her head about a third of the way down: the date, the progress bar and
+  the first card sit over the top of the screen
+- keep faces and detail away from the left and right edges, they get cropped
+- the top of the screen is dimmed with a gradient so the header stays readable
+
+Both modes need a transparent background, and both are fine with the same five
+moods — only the framing differs.
+
 ## Moods
 
 | Mood | When it shows |

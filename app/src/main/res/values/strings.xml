@@ -166,6 +166,9 @@
     <string name="settings_companion_style">Look</string>
     <string name="settings_companion_opacity">Visibility</string>
     <string name="settings_companion_no_packs">No artwork installed yet — the built-in stand-in is used. Drop a pack into assets/companion</string>
+    <string name="settings_companion_placement">Placement</string>
+    <string name="settings_companion_bottom">Bottom</string>
+    <string name="settings_companion_fullscreen">Full screen</string>
 </resources>
 
 

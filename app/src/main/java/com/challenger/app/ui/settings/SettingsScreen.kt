@@ -109,7 +109,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             onEnabled = viewModel::setEnabled,
             onPack = viewModel::setPack,
             onOption = viewModel::setOption,
-            onOpacity = viewModel::setOpacity
+            onOpacity = viewModel::setOpacity,
+            onFullScreen = viewModel::setFullScreen
         )
 
         SettingCard(

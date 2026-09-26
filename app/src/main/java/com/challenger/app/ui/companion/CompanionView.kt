@@ -62,14 +62,15 @@ fun Companion(
         val path = asset
         when {
             path == null -> PlaceholderCompanion(mood, Modifier.fillMaxSize())
-            path.endsWith(".json", ignoreCase = true) -> LottieCompanion(path, mood)
-            else -> ImageCompanion(path, mood)
+            path.endsWith(".json", ignoreCase = true) ->
+                LottieCompanion(path, mood, settings.fullScreen)
+            else -> ImageCompanion(path, mood, settings.fullScreen)
         }
     }
 }
 
 @Composable
-private fun LottieCompanion(assetPath: String, mood: CompanionMood) {
+private fun LottieCompanion(assetPath: String, mood: CompanionMood, fullScreen: Boolean) {
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(assetPath))
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -81,12 +82,14 @@ private fun LottieCompanion(assetPath: String, mood: CompanionMood) {
     LottieAnimation(
         composition = composition,
         progress = { progress },
+        contentScale = if (fullScreen) ContentScale.Crop else ContentScale.Fit,
+        alignment = Alignment.BottomCenter,
         modifier = Modifier.fillMaxSize()
     )
 }
 
 @Composable
-private fun ImageCompanion(assetPath: String, mood: CompanionMood) {
+private fun ImageCompanion(assetPath: String, mood: CompanionMood, fullScreen: Boolean) {
     val context = LocalContext.current
     val bitmap by produceState<ImageBitmap?>(initialValue = null, assetPath) {
         value = withContext(Dispatchers.IO) {
@@ -114,7 +117,10 @@ private fun ImageCompanion(assetPath: String, mood: CompanionMood) {
     Image(
         bitmap = image,
         contentDescription = null,
-        contentScale = ContentScale.Fit,
+        // Во весь экран кадр обрезается по краям, но ноги остаются внизу,
+        // поэтому фигура не «висит» в воздухе.
+        contentScale = if (fullScreen) ContentScale.Crop else ContentScale.Fit,
+        alignment = Alignment.BottomCenter,
         modifier = Modifier
             .fillMaxSize()
             .scale(scale)

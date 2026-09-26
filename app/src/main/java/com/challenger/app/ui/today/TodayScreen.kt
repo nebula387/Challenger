@@ -1,5 +1,6 @@
 package com.challenger.app.ui.today
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,12 +51,36 @@ fun TodayScreen(
         Companion(
             mood = state.mood,
             settings = companion,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .fillMaxHeight(0.55f)
-                .padding(bottom = 12.dp)
+            modifier = if (companion.fullScreen) {
+                Modifier.matchParentSize()
+            } else {
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.55f)
+                    .padding(bottom = 12.dp)
+            }
         )
+
+        // На весь экран заголовок оказывается поверх фотографии, поэтому
+        // притеняем верх — иначе дату и прогресс не прочитать.
+        if (companion.enabled && companion.fullScreen) {
+            val background = MaterialTheme.colorScheme.background
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.38f)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                background.copy(alpha = 0.92f),
+                                background.copy(alpha = 0f)
+                            )
+                        )
+                    )
+            )
+        }
 
         LazyColumn(
         modifier = Modifier.fillMaxSize(),
