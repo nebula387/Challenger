@@ -155,6 +155,10 @@
     <string name="settings_companion_placement">Расположение</string>
     <string name="settings_companion_bottom">Снизу</string>
     <string name="settings_companion_fullscreen">На весь экран</string>
+    <string name="settings_followup">Напомнить ещё раз, если не отмечено</string>
+    <string name="settings_followup_hint">Закрыть напоминание и забыть поставить галочку — обычное дело. Приложение напомнит снова через это время, до вечера.</string>
+    <string name="settings_followup_off">Выкл.</string>
+    <string name="settings_followup_hours">%d ч</string>
 </resources>
 
 

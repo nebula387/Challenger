@@ -169,6 +169,10 @@
     <string name="settings_companion_placement">Placement</string>
     <string name="settings_companion_bottom">Bottom</string>
     <string name="settings_companion_fullscreen">Full screen</string>
+    <string name="settings_followup">Nudge again if not ticked off</string>
+    <string name="settings_followup_hint">Dismissing a reminder without ticking the challenge off is easy to do by accident. The app asks again after this long, until the evening.</string>
+    <string name="settings_followup_off">Off</string>
+    <string name="settings_followup_hours">%d h</string>
 </resources>
 
 

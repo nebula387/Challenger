@@ -9,6 +9,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -41,6 +44,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.DisposableEffect
 import com.challenger.app.R
+import com.challenger.app.data.prefs.ReminderPrefs
 import com.challenger.app.notify.Notifications
 import com.challenger.app.notify.ReminderScheduler
 import com.challenger.app.widget.TodayWidgetReceiver
@@ -49,6 +53,7 @@ import com.challenger.app.widget.TodayWidgetReceiver
 fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
     val companion by viewModel.companion.collectAsStateWithLifecycle()
+    val followUp by viewModel.followUpHours.collectAsStateWithLifecycle()
     val packs by viewModel.packs.collectAsStateWithLifecycle()
     var refreshKey by remember { mutableStateOf(0) }
 
@@ -103,6 +108,11 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             onAction = { context.openBatterySettings() }
         )
 
+        FollowUpCard(
+            hours = followUp,
+            onSelect = viewModel::setFollowUpHours
+        )
+
         CompanionSettingsCard(
             settings = companion,
             packs = packs,
@@ -127,6 +137,46 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+/** Повтор напоминания: закрыл уведомление, но не отметил — напомним ещё раз. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FollowUpCard(hours: Int, onSelect: (Int) -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                stringResource(R.string.settings_followup),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                stringResource(R.string.settings_followup_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(10.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                ReminderPrefs.OPTIONS.forEach { option ->
+                    FilterChip(
+                        selected = option == hours,
+                        onClick = { onSelect(option) },
+                        label = {
+                            Text(
+                                if (option == 0) stringResource(R.string.settings_followup_off)
+                                else stringResource(R.string.settings_followup_hours, option)
+                            )
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

@@ -15,6 +15,9 @@ import java.time.temporal.ChronoUnit
  */
 object Schedule {
 
+    /** Позже этого часа повторы не ставим. */
+    val LATEST_FOLLOW_UP: LocalTime = LocalTime.of(22, 0)
+
     /** Запланирован ли челлендж на указанную дату. */
     fun isActiveOn(challenge: Challenge, date: LocalDate): Boolean {
         if (challenge.archived) return false
@@ -64,14 +67,35 @@ object Schedule {
         return activeDaysBetween(challenge, challenge.startDate, end).size
     }
 
+    /**
+     * Времена напоминаний за один день: заданные пользователем плюс повторы
+     * каждые [followUpHours] часов. Повтор нужен для случая «уведомление закрыл,
+     * а сделать забыл» — иначе челлендж молча теряется до завтра.
+     */
+    fun remindersOn(
+        challenge: Challenge,
+        day: LocalDate,
+        followUpHours: Int
+    ): List<LocalDateTime> {
+        val base = challenge.reminderTimes.sorted().map { LocalDateTime.of(day, it) }
+        if (followUpHours <= 0 || base.isEmpty()) return base
+
+        val step = followUpHours.toLong()
+        val repeats = generateSequence(base.first().plusHours(step)) { it.plusHours(step) }
+            // Переход на следующий день и поздний вечер отсекаем: ночью будить незачем.
+            .takeWhile { it.toLocalDate() == day && !it.toLocalTime().isAfter(LATEST_FOLLOW_UP) }
+
+        return (base + repeats).distinct().sorted()
+    }
+
     /** Ближайшее время напоминания после [now], уже с учётом расписания дней. */
     fun nextReminderAt(
         challenge: Challenge,
         now: LocalDateTime,
-        doneDates: Set<LocalDate> = emptySet()
+        doneDates: Set<LocalDate> = emptySet(),
+        followUpHours: Int = 0
     ): LocalDateTime? {
         if (!challenge.remindersEnabled || challenge.reminderTimes.isEmpty()) return null
-        val times = challenge.reminderTimes.sorted()
 
         var day = maxOf(now.toLocalDate(), challenge.startDate)
         val limit = challenge.endDate ?: now.toLocalDate().plusYears(1)
@@ -79,8 +103,7 @@ object Schedule {
         while (!day.isAfter(limit)) {
             // Выполненный день не тревожим — это главное требование: отметил и тишина.
             if (isActiveOn(challenge, day) && day !in doneDates) {
-                val candidate = times
-                    .map { LocalDateTime.of(day, it) }
+                val candidate = remindersOn(challenge, day, followUpHours)
                     .firstOrNull { it.isAfter(now) }
                 if (candidate != null) return candidate
             }

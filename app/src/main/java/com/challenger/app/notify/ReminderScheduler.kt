@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.challenger.app.data.db.ChallengerDatabase
+import com.challenger.app.data.prefs.ReminderPrefs
 import com.challenger.app.domain.Schedule
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -26,11 +27,16 @@ object ReminderScheduler {
         val challenges = db.challengeDao().getActive()
         val completionDao = db.completionDao()
         val now = LocalDateTime.now()
+        val followUp = ReminderPrefs(app).currentFollowUpHours()
 
         for (challenge in challenges) {
             cancel(app, challenge.id)
             val doneDates = completionDao.getByChallenge(challenge.id).map { it.date }.toSet()
-            val at = Schedule.nextReminderAt(challenge, now, doneDates) ?: continue
+            val at = Schedule.nextReminderAt(challenge, now, doneDates, followUp)
+            if (at == null) {
+                Log.i(TAG, "no reminder for #" + challenge.id + " (" + challenge.title + ")")
+                continue
+            }
             schedule(app, challenge.id, at)
         }
     }
@@ -43,7 +49,9 @@ object ReminderScheduler {
         if (challenge.archived) return
 
         val doneDates = db.completionDao().getByChallenge(challengeId).map { it.date }.toSet()
-        val at = Schedule.nextReminderAt(challenge, LocalDateTime.now(), doneDates) ?: return
+        val followUp = ReminderPrefs(app).currentFollowUpHours()
+        val at = Schedule.nextReminderAt(challenge, LocalDateTime.now(), doneDates, followUp)
+            ?: return
         schedule(app, challengeId, at)
     }
 
@@ -51,6 +59,8 @@ object ReminderScheduler {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
         val triggerAt = at.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val intent = alarmIntent(context, challengeId)
+
+        Log.i(TAG, "scheduling #" + challengeId + " at " + at + " exact=" + canScheduleExact(context))
 
         try {
             if (canScheduleExact(context)) {
