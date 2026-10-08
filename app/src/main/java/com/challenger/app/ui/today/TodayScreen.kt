@@ -165,6 +165,7 @@ fun TodayScreen(
                             DoneSummary(
                                 count = doneRows.size,
                                 expanded = showDone,
+                                expandsUpward = bottomAnchored,
                                 onClick = { showDone = !showDone }
                             )
                         }
@@ -194,9 +195,19 @@ fun TodayScreen(
     }
 }
 
-/** Свёрнутая строка выполненного: галочка, счётчик и разворот по нажатию. */
+/**
+ * Свёрнутая строка выполненного: галочка, счётчик и разворот по нажатию.
+ *
+ * Стрелка показывает туда, куда поедет список. При [expandsUpward] он прижат
+ * к низу экрана и растёт вверх, поэтому обычное направление перевёрнуто.
+ */
 @Composable
-private fun DoneSummary(count: Int, expanded: Boolean, onClick: () -> Unit) {
+private fun DoneSummary(
+    count: Int,
+    expanded: Boolean,
+    expandsUpward: Boolean,
+    onClick: () -> Unit
+) {
     val dark = LocalIsDark.current
     val green = TodayStatus.DONE.color(dark)
 
@@ -231,8 +242,9 @@ private fun DoneSummary(count: Int, expanded: Boolean, onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
+        val pointsUp = if (expandsUpward) !expanded else expanded
         Icon(
-            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            imageVector = if (pointsUp) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
