@@ -54,6 +54,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
     val companion by viewModel.companion.collectAsStateWithLifecycle()
     val followUp by viewModel.followUpHours.collectAsStateWithLifecycle()
+    val digestEnabled by viewModel.digestEnabled.collectAsStateWithLifecycle()
+    val digestMinutes by viewModel.digestMinutes.collectAsStateWithLifecycle()
     val freezes by viewModel.freezes.collectAsStateWithLifecycle()
     val freezeDaysLeft by viewModel.freezeDaysLeft.collectAsStateWithLifecycle()
     val packs by viewModel.packs.collectAsStateWithLifecycle()
@@ -108,6 +110,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             ok = true,
             action = stringResource(R.string.settings_battery_open),
             onAction = { context.openBatterySettings() }
+        )
+
+        DigestCard(
+            enabled = digestEnabled,
+            minutes = digestMinutes,
+            onEnabled = viewModel::setDigestEnabled,
+            onTime = viewModel::setDigestTime
         )
 
         FollowUpCard(

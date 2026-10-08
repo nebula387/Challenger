@@ -13,11 +13,16 @@ import com.challenger.app.MainActivity
 import com.challenger.app.R
 import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Priority
+import com.challenger.app.domain.Digest
 
 object Notifications {
 
     const val CHANNEL_MUST = "reminders_must"
     const val CHANNEL_NORMAL = "reminders_normal"
+    const val CHANNEL_DIGEST = "daily_digest"
+
+    /** Не пересекается с id челленджей: те растут с единицы. */
+    private const val DIGEST_ID = Int.MAX_VALUE - 1
 
     fun ensureChannels(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
@@ -39,8 +44,73 @@ object Notifications {
             description = context.getString(R.string.channel_normal_desc)
         }
 
+        // Свой канал, чтобы сводку можно было приглушить в системе отдельно
+        // от напоминаний — это разные по срочности вещи.
+        val digest = NotificationChannel(
+            CHANNEL_DIGEST,
+            context.getString(R.string.channel_digest_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = context.getString(R.string.channel_digest_desc)
+        }
+
         manager.createNotificationChannel(must)
         manager.createNotificationChannel(normal)
+        manager.createNotificationChannel(digest)
+    }
+
+    /**
+     * Картина дня одним уведомлением: каждое дело своей строкой, обязательные
+     * сверху. Сворачивается в заголовок, разворачивается в список.
+     */
+    fun showDigest(context: Context, challenges: List<Challenge>, face: Bitmap?) {
+        ensureChannels(context)
+        val ordered = Digest.ordered(challenges)
+        val mustCount = ordered.count { it.priority == Priority.MUST }
+
+        val openApp = PendingIntent.getActivity(
+            context,
+            DIGEST_ID,
+            Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val title = context.resources.getQuantityString(
+            R.plurals.digest_title, ordered.size, ordered.size
+        )
+        val summary = if (mustCount > 0) {
+            context.getString(R.string.digest_must_count, mustCount)
+        } else {
+            null
+        }
+
+        val style = NotificationCompat.InboxStyle().setBigContentTitle(title)
+        ordered.forEach { style.addLine(digestLine(it)) }
+        summary?.let(style::setSummaryText)
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_DIGEST)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(title)
+            // В свёрнутом виде видно, с чего начать.
+            .setContentText(ordered.take(3).joinToString(", ") { it.title })
+            .setStyle(style)
+            .setLargeIcon(face)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setContentIntent(openApp)
+            .setAutoCancel(true)
+            .build()
+
+        runCatching { NotificationManagerCompat.from(context).notify(DIGEST_ID, notification) }
+    }
+
+    private fun digestLine(challenge: Challenge): String {
+        val goal = if (challenge.targetValue > 0) {
+            " — " + challenge.targetValue + " " + challenge.unit
+        } else {
+            ""
+        }
+        return challenge.emoji + " " + challenge.title + goal
     }
 
     /**

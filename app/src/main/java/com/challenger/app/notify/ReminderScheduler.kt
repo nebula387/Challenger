@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import com.challenger.app.data.db.ChallengerDatabase
 import com.challenger.app.data.prefs.ReminderPrefs
+import com.challenger.app.domain.Digest
 import com.challenger.app.domain.FrozenDays
 import com.challenger.app.domain.Schedule
 import java.time.LocalDateTime
@@ -41,7 +42,43 @@ object ReminderScheduler {
             }
             schedule(app, challenge.id, at)
         }
+
+        // Сводку пересобираем здесь же: этот путь уже вызывают старт приложения,
+        // перезагрузка телефона и каждое изменение данных.
+        scheduleDigest(app)
     }
+
+    /**
+     * Будильник утренней сводки — один на всё приложение, на ближайшее время.
+     * Пауза и пустой день проверяются в момент срабатывания, а не здесь:
+     * так не надо помнить, когда что менялось.
+     */
+    suspend fun scheduleDigest(context: Context) {
+        val app = context.applicationContext
+        val prefs = ReminderPrefs(app)
+        val intent = digestIntent(app)
+        val alarmManager = app.getSystemService(AlarmManager::class.java) ?: return
+        alarmManager.cancel(intent)
+
+        if (!prefs.currentDigestEnabled()) {
+            Log.i(TAG, "digest off")
+            return
+        }
+
+        val at = Digest.nextAt(LocalDateTime.now(), Digest.timeOf(prefs.currentDigestMinutes()))
+        Log.i(TAG, "scheduling digest at " + at)
+        setAlarm(app, alarmManager, at, intent)
+    }
+
+    private fun digestIntent(context: Context): PendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            DIGEST_REQUEST_CODE,
+            Intent(context, DigestReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+    private const val DIGEST_REQUEST_CODE = 99_999
 
     suspend fun rescheduleOne(context: Context, challengeId: Long) {
         val app = context.applicationContext
@@ -66,11 +103,17 @@ object ReminderScheduler {
 
     fun schedule(context: Context, challengeId: Long, at: LocalDateTime) {
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return
-        val triggerAt = at.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-        val intent = alarmIntent(context, challengeId)
-
         Log.i(TAG, "scheduling #" + challengeId + " at " + at + " exact=" + canScheduleExact(context))
+        setAlarm(context, alarmManager, at, alarmIntent(context, challengeId))
+    }
 
+    private fun setAlarm(
+        context: Context,
+        alarmManager: AlarmManager,
+        at: LocalDateTime,
+        intent: PendingIntent
+    ) {
+        val triggerAt = at.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         try {
             if (canScheduleExact(context)) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent)
@@ -79,7 +122,7 @@ object ReminderScheduler {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent)
             }
         } catch (e: SecurityException) {
-            Log.w(TAG, "Не удалось поставить точный будильник для " + challengeId, e)
+            Log.w(TAG, "Не удалось поставить точный будильник на " + at, e)
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent)
         }
     }

@@ -19,7 +19,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.challenger.app.domain.Digest
 import java.time.LocalDate
+import java.time.LocalTime
 
 class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -54,6 +56,23 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 CompanionPacks.available(getApplication())
             }
         }
+    }
+
+    val digestEnabled: StateFlow<Boolean> = reminderPrefs.digestEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), true)
+
+    val digestMinutes: StateFlow<Int> = reminderPrefs.digestMinutes
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Digest.DEFAULT_MINUTES)
+
+    /** Сводка — отдельный будильник, его переставляем сразу после смены настройки. */
+    fun setDigestEnabled(value: Boolean) = viewModelScope.launch {
+        reminderPrefs.setDigestEnabled(value)
+        ReminderScheduler.scheduleDigest(getApplication())
+    }
+
+    fun setDigestTime(time: LocalTime) = viewModelScope.launch {
+        reminderPrefs.setDigestMinutes(time.hour * 60 + time.minute)
+        ReminderScheduler.scheduleDigest(getApplication())
     }
 
     /** Повтор меняет расписание будильников, поэтому сразу пересобираем их. */

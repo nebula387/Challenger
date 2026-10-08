@@ -191,6 +191,17 @@
     <string name="settings_freeze_overlap">Overlaps a pause that is already planned</string>
     <string name="today_paused_until">On pause until %s</string>
     <string name="today_paused_hint">Reminders are off. The streak will wait for you</string>
+    <string name="channel_digest_name">Morning digest</string>
+    <string name="channel_digest_desc">One notification with everything planned for the day</string>
+    <plurals name="digest_title">
+        <item quantity="one">Today: %d thing to do</item>
+        <item quantity="other">Today: %d things to do</item>
+    </plurals>
+    <string name="digest_must_count">Must-do: %d</string>
+    <string name="settings_digest">Morning digest</string>
+    <string name="settings_digest_hint">Everything planned for the day in one notification, must-do first. Skipped on paused days and when nothing is left.</string>
+    <string name="settings_digest_time">At %s</string>
+    <string name="settings_digest_change">Change time</string>
 </resources>
 
 

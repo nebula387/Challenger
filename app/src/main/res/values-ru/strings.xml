@@ -177,6 +177,19 @@
     <string name="settings_freeze_overlap">Пересекается с уже запланированной паузой</string>
     <string name="today_paused_until">На паузе до %s</string>
     <string name="today_paused_hint">Напоминания выключены. Серия вас дождётся</string>
+    <string name="channel_digest_name">Утренняя сводка</string>
+    <string name="channel_digest_desc">Одно уведомление со всеми делами на день</string>
+    <plurals name="digest_title">
+        <item quantity="one">Сегодня %d дело</item>
+        <item quantity="few">Сегодня %d дела</item>
+        <item quantity="many">Сегодня %d дел</item>
+        <item quantity="other">Сегодня %d дела</item>
+    </plurals>
+    <string name="digest_must_count">Обязательных: %d</string>
+    <string name="settings_digest">Утренняя сводка</string>
+    <string name="settings_digest_hint">Все дела на день одним уведомлением, обязательные сверху. В дни паузы и когда всё уже сделано не приходит.</string>
+    <string name="settings_digest_time">В %s</string>
+    <string name="settings_digest_change">Изменить время</string>
 </resources>
 
 
