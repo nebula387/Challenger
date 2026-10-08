@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import com.challenger.app.data.db.ChallengerDatabase
 import com.challenger.app.data.prefs.ReminderPrefs
+import com.challenger.app.domain.FrozenDays
 import com.challenger.app.domain.Schedule
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,11 +29,12 @@ object ReminderScheduler {
         val completionDao = db.completionDao()
         val now = LocalDateTime.now()
         val followUp = ReminderPrefs(app).currentFollowUpHours()
+        val frozen = frozenDays(db)
 
         for (challenge in challenges) {
             cancel(app, challenge.id)
             val doneDates = completionDao.getByChallenge(challenge.id).map { it.date }.toSet()
-            val at = Schedule.nextReminderAt(challenge, now, doneDates, followUp)
+            val at = Schedule.nextReminderAt(challenge, now, doneDates, followUp, frozen)
             if (at == null) {
                 Log.i(TAG, "no reminder for #" + challenge.id + " (" + challenge.title + ")")
                 continue
@@ -50,9 +52,16 @@ object ReminderScheduler {
 
         val doneDates = db.completionDao().getByChallenge(challengeId).map { it.date }.toSet()
         val followUp = ReminderPrefs(app).currentFollowUpHours()
-        val at = Schedule.nextReminderAt(challenge, LocalDateTime.now(), doneDates, followUp)
-            ?: return
+        val at = Schedule.nextReminderAt(
+            challenge, LocalDateTime.now(), doneDates, followUp, frozenDays(db)
+        ) ?: return
         schedule(app, challengeId, at)
+    }
+
+    /** Дни на паузе выпадают из расписания, значит и будильников на них нет. */
+    private suspend fun frozenDays(db: ChallengerDatabase): FrozenDays {
+        val ranges = db.freezeDao().getAll()
+        return FrozenDays { date -> ranges.any { it.covers(date) } }
     }
 
     fun schedule(context: Context, challengeId: Long, at: LocalDateTime) {

@@ -37,8 +37,9 @@ class StatsViewModel(
 
     val state: StateFlow<StatsUiState> = combine(
         repo.observeById(challengeId),
-        repo.observeCompletions(challengeId)
-    ) { challenge, completions ->
+        repo.observeCompletions(challengeId),
+        repo.observeFrozen()
+    ) { challenge, completions, frozen ->
         if (challenge == null) return@combine StatsUiState()
 
         val today = LocalDate.now()
@@ -52,7 +53,7 @@ class StatsViewModel(
             .takeWhile { !it.isAfter(to) }
             .map { day ->
                 val cell = when {
-                    !Schedule.isActiveOn(challenge, day) -> DayCell.OFF
+                    !Schedule.isActiveOn(challenge, day, frozen) -> DayCell.OFF
                     day in done -> DayCell.DONE
                     day.isAfter(today) -> DayCell.FUTURE
                     day == today -> DayCell.PENDING
@@ -64,10 +65,10 @@ class StatsViewModel(
 
         StatsUiState(
             challenge = challenge,
-            stats = Stats.of(challenge, completions, today),
+            stats = Stats.of(challenge, completions, today, frozen),
             calendar = calendar,
             doneToday = today in done,
-            activeToday = Schedule.isActiveOn(challenge, today)
+            activeToday = Schedule.isActiveOn(challenge, today, frozen)
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
 

@@ -9,6 +9,7 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Completion
+import com.challenger.app.data.model.Freeze
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -72,4 +73,20 @@ interface CompletionDao {
 
     @Query("DELETE FROM completions WHERE challengeId = :challengeId")
     suspend fun removeAllFor(challengeId: Long)
+}
+
+@Dao
+interface FreezeDao {
+
+    @Query("SELECT * FROM freezes ORDER BY startDate")
+    fun observeAll(): Flow<List<Freeze>>
+
+    @Query("SELECT * FROM freezes ORDER BY startDate")
+    suspend fun getAll(): List<Freeze>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(freeze: Freeze): Long
+
+    @Query("DELETE FROM freezes WHERE id = :id")
+    suspend fun delete(id: Long)
 }

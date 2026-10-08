@@ -10,6 +10,7 @@ import com.challenger.app.data.prefs.CompanionSettings
 import com.challenger.app.data.prefs.ReminderPrefs
 import com.challenger.app.domain.CompanionMoods
 import com.challenger.app.domain.CompanionMood
+import com.challenger.app.domain.FrozenDays
 import com.challenger.app.domain.Schedule
 import com.challenger.app.domain.Stats
 import com.challenger.app.domain.TodayStatus
@@ -41,7 +42,9 @@ data class TodayUiState(
     val must: List<TodayRow> = emptyList(),
     val rest: List<TodayRow> = emptyList(),
     val loading: Boolean = true,
-    val mood: CompanionMood = CompanionMood.NEUTRAL
+    val mood: CompanionMood = CompanionMood.NEUTRAL,
+    /** Последний день идущей паузы; null — паузы нет. */
+    val pausedUntil: LocalDate? = null
 ) {
     val all: List<TodayRow> get() = must + rest
     val doneCount: Int get() = all.count { it.isDone }
@@ -75,20 +78,22 @@ class TodayViewModel(app: Application) : AndroidViewModel(app) {
         repo.observeActive(),
         repo.observeAllCompletions(),
         reminderPrefs.followUpHours,
-        minuteTicks
-    ) { challenges, completions, sadAfterHours, now ->
+        minuteTicks,
+        repo.observeFreezes()
+    ) { challenges, completions, sadAfterHours, now, freezes ->
             val today = LocalDate.now()
+            val frozen = FrozenDays { date -> freezes.any { it.covers(date) } }
             val byChallenge = completions.groupBy { it.challengeId }
 
             val rows = challenges
-                .filter { Schedule.isActiveOn(it, today) }
+                .filter { Schedule.isActiveOn(it, today, frozen) }
                 .map { challenge ->
                     val own = byChallenge[challenge.id].orEmpty()
                     val done = own.any { it.date == today }
                     TodayRow(
                         challenge = challenge,
-                        status = todayStatus(challenge, done),
-                        streak = Stats.of(challenge, own, today).currentStreak,
+                        status = todayStatus(challenge, done, frozen = frozen),
+                        streak = Stats.of(challenge, own, today, frozen).currentStreak,
                         dayNumber = Schedule.dayNumber(challenge, today)
                     )
                 }
@@ -104,6 +109,7 @@ class TodayViewModel(app: Application) : AndroidViewModel(app) {
                 rest = rows.filter { it.challenge.priority != Priority.MUST }
                     .sortedWith(compareBy({ it.isDone }, { it.challenge.priority.ordinal })),
                 loading = false,
+                pausedUntil = freezes.firstOrNull { it.covers(today) }?.endDate,
                 mood = CompanionMoods.moodFor(
                     doneCount = doneCount,
                     total = rows.size,

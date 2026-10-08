@@ -55,6 +55,7 @@ import com.challenger.app.ui.companion.Companion
 import com.challenger.app.ui.components.ChallengeCard
 import com.challenger.app.ui.components.scheduleSummary
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -157,7 +158,10 @@ fun TodayScreen(
                     }
                 ) {
                     if (!state.loading && state.total == 0) {
-                        item { EmptyToday(onAddChallenge) }
+                        item {
+                            val paused = state.pausedUntil
+                            if (paused != null) PausedToday() else EmptyToday(onAddChallenge)
+                        }
                     }
 
                     if (doneRows.isNotEmpty()) {
@@ -290,7 +294,9 @@ private fun DayHeader(state: TodayUiState) {
     val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", locale)
     val title = state.date.format(formatter).replaceFirstChar { it.uppercase(locale) }
 
+    val paused = state.pausedUntil
     val subtitle = when {
+        paused != null -> stringResource(R.string.today_paused_until, paused.shortDate())
         state.total == 0 -> stringResource(R.string.today_nothing_planned)
         state.allDone -> stringResource(R.string.today_all_done)
         state.mustLeft > 0 -> stringResource(R.string.today_must_left, state.mustLeft)
@@ -367,3 +373,22 @@ private val SECTION_ROW = 34.dp
 
 /** Какую долю свободной высоты можно занять, не доходя до лица спутницы. */
 private const val FACE_HEADROOM = 0.62f
+
+/** Пауза: напоминаний нет, и это нормально, а не повод добавлять челленджи. */
+@Composable
+private fun PausedToday() {
+    Text(
+        text = stringResource(R.string.today_paused_hint),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            // Без подложки текст теряется на картинке за ним.
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f))
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    )
+}
+
+private fun LocalDate.shortDate(): String =
+    format(DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault()))

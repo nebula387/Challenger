@@ -38,20 +38,24 @@ class ChallengesViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = app.appContainer.repository
 
     val state: StateFlow<ChallengesUiState> =
-        combine(repo.observeAll(), repo.observeAllCompletions()) { challenges, completions ->
+        combine(
+            repo.observeAll(),
+            repo.observeAllCompletions(),
+            repo.observeFrozen()
+        ) { challenges, completions, frozen ->
             val today = LocalDate.now()
             val byChallenge = completions.groupBy { it.challengeId }
 
             val rows = challenges.map { challenge ->
                 val own = byChallenge[challenge.id].orEmpty()
-                val stats = Stats.of(challenge, own, today)
+                val stats = Stats.of(challenge, own, today, frozen)
                 ChallengeRow(
                     challenge = challenge,
                     streak = stats.currentStreak,
                     doneCount = stats.doneCount,
                     plannedTotal = stats.plannedTotal,
                     progress = stats.overallProgress,
-                    activeToday = Schedule.isActiveOn(challenge, today),
+                    activeToday = Schedule.isActiveOn(challenge, today, frozen),
                     doneToday = own.any { it.date == today }
                 )
             }

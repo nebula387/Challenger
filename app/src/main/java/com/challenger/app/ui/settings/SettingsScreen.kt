@@ -54,6 +54,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val context = LocalContext.current
     val companion by viewModel.companion.collectAsStateWithLifecycle()
     val followUp by viewModel.followUpHours.collectAsStateWithLifecycle()
+    val freezes by viewModel.freezes.collectAsStateWithLifecycle()
+    val freezeDaysLeft by viewModel.freezeDaysLeft.collectAsStateWithLifecycle()
     val packs by viewModel.packs.collectAsStateWithLifecycle()
     var refreshKey by remember { mutableStateOf(0) }
 
@@ -113,6 +115,14 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             onSelect = viewModel::setFollowUpHours
         )
 
+        FreezeCard(
+            freezes = freezes,
+            daysLeft = freezeDaysLeft,
+            onPlan = viewModel::planFreeze,
+            onCancel = viewModel::cancelFreeze,
+            onEndEarly = viewModel::endFreezeEarly
+        )
+
         CompanionSettingsCard(
             settings = companion,
             packs = packs,
@@ -133,7 +143,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
         Spacer(Modifier.height(8.dp))
         Text(
-            text = stringResource(R.string.settings_about),
+            text = stringResource(R.string.settings_about, context.versionName()),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -249,3 +259,9 @@ private fun Context.requestPinWidget() {
     )
     runCatching { manager.requestPinAppWidget(provider, null, callback) }
 }
+
+/** Версия из манифеста: вписанная в строку руками отстаёт от сборки. */
+private fun Context.versionName(): String =
+    runCatching { packageManager.getPackageInfo(packageName, 0).versionName }
+        .getOrNull()
+        .orEmpty()

@@ -126,7 +126,7 @@
     <string name="settings_widget">Виджет на рабочий стол</string>
     <string name="settings_widget_hint">Список дел на сегодня с галочками, без захода в приложение</string>
     <string name="settings_widget_add">Добавить виджет</string>
-    <string name="settings_about">Challenger 1.0 — всё хранится на телефоне, аккаунт и интернет не нужны</string>
+    <string name="settings_about">Challenger %s — всё хранится на телефоне, аккаунт и интернет не нужны</string>
 
     <string name="channel_must_name">Обязательные челленджи</string>
     <string name="channel_must_desc">Напоминания о том, что пропускать нельзя</string>
@@ -161,6 +161,22 @@
     <string name="settings_followup_off">Выкл.</string>
     <string name="settings_followup_hours">%d ч</string>
     <string name="today_done_count">Выполнено: %d</string>
+    <string name="settings_freeze">Пауза</string>
+    <string name="settings_freeze_hint">Поездка или болезнь? Запланируйте паузу, и эти дни выпадут из расписания: ни напоминаний, ни пропусков, серия их перешагнёт. Начать можно с сегодняшнего дня, но не задним числом — уже случившийся пропуск ею не закрыть.</string>
+    <string name="settings_freeze_left">Осталось %1$d из %2$d дней в этом году</string>
+    <string name="settings_freeze_plan">Запланировать паузу</string>
+    <string name="settings_freeze_active">На паузе до %s</string>
+    <string name="settings_freeze_planned">С %1$s по %2$s</string>
+    <string name="settings_freeze_none">Пауз не запланировано</string>
+    <string name="settings_freeze_too_long">%d дней не укладываются в остаток года</string>
+    <string name="settings_freeze_started">Последний день паузы, с завтра — снова по расписанию</string>
+    <string name="settings_freeze_confirm">Запланировать</string>
+    <string name="settings_freeze_remove">Отменить паузу</string>
+    <string name="settings_freeze_end_early">Закончить досрочно</string>
+    <string name="settings_freeze_end_early_hint">Выздоровели раньше? Сегодня остаётся на паузе, с завтра расписание вернётся, а неиспользованные дни — в лимит.</string>
+    <string name="settings_freeze_overlap">Пересекается с уже запланированной паузой</string>
+    <string name="today_paused_until">На паузе до %s</string>
+    <string name="today_paused_hint">Напоминания выключены. Серия вас дождётся</string>
 </resources>
 
 

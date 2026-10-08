@@ -4,11 +4,13 @@ import android.content.Context
 import com.challenger.app.data.db.ChallengerDatabase
 import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Completion
+import com.challenger.app.data.model.Freeze
 import com.challenger.app.data.model.Priority
 import com.challenger.app.data.prefs.ReminderPrefs
 import com.challenger.app.domain.ChallengeStats
 import com.challenger.app.domain.CompanionMood
 import com.challenger.app.domain.CompanionMoods
+import com.challenger.app.domain.FrozenDays
 import com.challenger.app.domain.Schedule
 import com.challenger.app.domain.Stats
 import com.challenger.app.notify.ReminderScheduler
@@ -29,6 +31,7 @@ class ChallengeRepository(
 ) {
     private val challenges = db.challengeDao()
     private val completions = db.completionDao()
+    private val freezes = db.freezeDao()
 
     fun observeActive(): Flow<List<Challenge>> = challenges.observeActive()
     fun observeAll(): Flow<List<Challenge>> = challenges.observeAll()
@@ -44,16 +47,78 @@ class ChallengeRepository(
     fun observeStats(challengeId: Long): Flow<ChallengeStats> =
         combine(
             challenges.observeById(challengeId),
-            completions.observeByChallenge(challengeId)
-        ) { challenge, done ->
-            challenge?.let { Stats.of(it, done) } ?: ChallengeStats()
+            completions.observeByChallenge(challengeId),
+            observeFrozen()
+        ) { challenge, done, frozen ->
+            challenge?.let { Stats.of(it, done, frozen = frozen) } ?: ChallengeStats()
         }
+
+    fun observeFreezes(): Flow<List<Freeze>> = freezes.observeAll()
+
+    /** Паузы в виде, который понимает расписание. */
+    fun observeFrozen(): Flow<FrozenDays> = freezes.observeAll().map { ranges ->
+        FrozenDays { date -> ranges.any { it.covers(date) } }
+    }
+
+    suspend fun frozenDays(): FrozenDays {
+        val ranges = freezes.getAll()
+        return FrozenDays { date -> ranges.any { it.covers(date) } }
+    }
+
+    /** Активная прямо сейчас пауза, если она есть. */
+    suspend fun activeFreeze(today: LocalDate = LocalDate.now()): Freeze? =
+        freezes.getAll().firstOrNull { it.covers(today) }
+
+    /**
+     * Сколько дней паузы ещё можно потратить в этом году.
+     * Прошедшие паузы тоже считаются — иначе лимит ничего не ограничивает.
+     */
+    suspend fun freezeDaysLeft(year: Int = LocalDate.now().year): Int =
+        Freeze.daysLeftIn(year, freezes.getAll())
+
+    /**
+     * Ставит паузу. Возвращает false, если окно начинается слишком рано
+     * или не укладывается в годовой лимит.
+     */
+    suspend fun addFreeze(start: LocalDate, end: LocalDate): Boolean {
+        if (end.isBefore(start)) return false
+        if (start.isBefore(Freeze.earliestStart())) return false
+
+        val freeze = Freeze(startDate = start, endDate = end)
+        if (freeze.days > freezeDaysLeft()) return false
+        // Пересечение посчитало бы одни и те же дни в лимит дважды.
+        if (freezes.getAll().any { it.overlaps(freeze) }) return false
+
+        freezes.insert(freeze)
+        syncSideEffects()
+        return true
+    }
+
+    /** Снять целиком можно только ещё не начавшуюся паузу: прошлое она не переписывает. */
+    suspend fun removeFreeze(freeze: Freeze): Boolean {
+        if (freeze.hasStarted()) return false
+        freezes.delete(freeze.id)
+        syncSideEffects()
+        return true
+    }
+
+    /** Выздоровел раньше — с завтра снова по расписанию, остаток дней вернётся в лимит. */
+    suspend fun endFreezeEarly(freeze: Freeze): Boolean {
+        val trimmed = freeze.endedEarly() ?: return false
+        freezes.insert(trimmed)
+        syncSideEffects()
+        return true
+    }
 
     /** Челленджи на сегодня вместе с отметкой о выполнении. */
     fun observeToday(date: LocalDate = LocalDate.now()): Flow<List<TodayItem>> =
-        combine(challenges.observeActive(), completions.observeByDate(date)) { list, done ->
+        combine(
+            challenges.observeActive(),
+            completions.observeByDate(date),
+            observeFrozen()
+        ) { list, done, frozen ->
             val doneById = done.associateBy { it.challengeId }
-            list.filter { Schedule.isActiveOn(it, date) }
+            list.filter { Schedule.isActiveOn(it, date, frozen) }
                 .map { TodayItem(it, doneById[it.id]) }
         }
 
@@ -115,8 +180,9 @@ class ChallengeRepository(
     /** Снимок дня для виджета и уведомлений, без подписки на Flow. */
     suspend fun todaySnapshot(date: LocalDate = LocalDate.now()): List<TodayItem> {
         val done = completions.getByDate(date).associateBy { it.challengeId }
+        val frozen = frozenDays()
         return challenges.getActive()
-            .filter { Schedule.isActiveOn(it, date) }
+            .filter { Schedule.isActiveOn(it, date, frozen) }
             .map { TodayItem(it, done[it.id]) }
     }
 

@@ -137,7 +137,7 @@
     <string name="settings_widget">Home screen widget</string>
     <string name="settings_widget_hint">Today\'s list with checkboxes, no need to open the app</string>
     <string name="settings_widget_add">Add widget</string>
-    <string name="settings_about">Challenger 1.0 — everything stays on your phone, no account, no internet</string>
+    <string name="settings_about">Challenger %s — everything stays on your phone, no account, no internet</string>
 
     <!-- Notifications -->
     <string name="channel_must_name">Must-do challenges</string>
@@ -175,6 +175,22 @@
     <string name="settings_followup_off">Off</string>
     <string name="settings_followup_hours">%d h</string>
     <string name="today_done_count">Done: %d</string>
+    <string name="settings_freeze">Pause</string>
+    <string name="settings_freeze_hint">Travelling or ill? Plan a pause and those days drop out of the schedule: no reminders, no misses, the streak carries over them. It can start today but never in the past, so it cannot excuse a day already missed.</string>
+    <string name="settings_freeze_left">%1$d of %2$d days left this year</string>
+    <string name="settings_freeze_plan">Plan a pause</string>
+    <string name="settings_freeze_active">On pause until %s</string>
+    <string name="settings_freeze_planned">From %1$s to %2$s</string>
+    <string name="settings_freeze_none">Nothing planned</string>
+    <string name="settings_freeze_too_long">%d days do not fit what is left this year</string>
+    <string name="settings_freeze_started">Last day of the pause, back on schedule tomorrow</string>
+    <string name="settings_freeze_confirm">Plan</string>
+    <string name="settings_freeze_remove">Cancel this pause</string>
+    <string name="settings_freeze_end_early">End early</string>
+    <string name="settings_freeze_end_early_hint">Feeling better? Today stays paused, the schedule resumes tomorrow and the unused days go back to the budget.</string>
+    <string name="settings_freeze_overlap">Overlaps a pause that is already planned</string>
+    <string name="today_paused_until">On pause until %s</string>
+    <string name="today_paused_hint">Reminders are off. The streak will wait for you</string>
 </resources>
 
 
