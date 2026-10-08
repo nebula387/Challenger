@@ -46,9 +46,16 @@ data class CompanionPack(
         }
         val bare = template.replace(PLACEHOLDER, "").replace("__", "_").trimStart('_')
 
+        // Расширение подбираем сами: пак переживает замену jpg на png без правки манифеста.
         return listOf(filled, bare)
+            .flatMap { name -> withKnownExtensions(name) }
             .map { "$ASSET_ROOT/$id/$it" }
             .firstOrNull { exists(context, it) }
+    }
+
+    private fun withKnownExtensions(name: String): List<String> {
+        val stem = name.substringBeforeLast('.', name)
+        return listOf(name) + EXTENSIONS.map { "$stem.$it" }
     }
 
     /** Есть ли в паке хоть один файл, который реально лежит в assets. */
@@ -57,14 +64,17 @@ data class CompanionPack(
 
     /** Нет кадра для настроения — берём ближайшее по смыслу. */
     private fun fallbackMood(mood: CompanionMood): CompanionMood = when (mood) {
-        CompanionMood.SAD -> CompanionMood.BORED
+        CompanionMood.PRAISE -> CompanionMood.CELEBRATING
         CompanionMood.CELEBRATING -> CompanionMood.HAPPY
-        CompanionMood.HAPPY -> CompanionMood.INTERESTED
-        else -> CompanionMood.BORED
+        CompanionMood.HAPPY -> CompanionMood.NEUTRAL
+        CompanionMood.SAD -> CompanionMood.WAITING
+        CompanionMood.WAITING -> CompanionMood.NEUTRAL
+        CompanionMood.NEUTRAL -> CompanionMood.WAITING
     }
 
     companion object {
         const val ASSET_ROOT = "companion"
+        private val EXTENSIONS = listOf("webp", "png", "jpg", "json")
         // На Android регулярки строже, чем на JVM: закрывающую скобку
         // обязательно экранировать, иначе PatternSyntaxException при загрузке класса.
         private val PLACEHOLDER = Regex("""\{(\w+)\}""")

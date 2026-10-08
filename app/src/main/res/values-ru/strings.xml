@@ -141,8 +141,9 @@
     <string name="widget_today">Сегодня</string>
     <string name="widget_empty">На сегодня ничего не запланировано</string>
     <string name="companion_sad">День уходит. Может, начнём?</string>
-    <string name="companion_bored">Жду, когда начнёшь</string>
-    <string name="companion_interested">Уже лучше. Продолжай</string>
+    <string name="companion_neutral">Новый день. Пока ничего не горит</string>
+    <string name="companion_waiting">Жду, когда начнёшь</string>
+    <string name="companion_praise">Вот так и надо</string>
     <string name="companion_happy">Всё важное закрыто. Молодец</string>
     <string name="companion_celebrating">Весь день закрыт. Танцуем</string>
 

@@ -37,7 +37,7 @@ import com.challenger.app.domain.CompanionMood
 @Composable
 fun PlaceholderCompanion(mood: CompanionMood, modifier: Modifier = Modifier) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        if (mood == CompanionMood.CELEBRATING) {
+        if (mood == CompanionMood.CELEBRATING || mood == CompanionMood.PRAISE) {
             FloatingKisses()
         }
 
@@ -61,9 +61,9 @@ fun PlaceholderCompanion(mood: CompanionMood, modifier: Modifier = Modifier) {
 private fun MoodFigure(mood: CompanionMood) {
     val transition = rememberInfiniteTransition(label = "figure")
 
-    val dancing = mood == CompanionMood.CELEBRATING
+    val dancing = mood == CompanionMood.CELEBRATING || mood == CompanionMood.PRAISE
     val period = when (mood) {
-        CompanionMood.CELEBRATING -> 420
+        CompanionMood.CELEBRATING, CompanionMood.PRAISE -> 420
         CompanionMood.HAPPY -> 1100
         else -> 2400
     }
@@ -126,17 +126,19 @@ private fun FloatingKisses() {
 }
 
 private fun emojiFor(mood: CompanionMood): String = when (mood) {
+    CompanionMood.NEUTRAL -> "💁‍♀️"
+    CompanionMood.WAITING -> "🧍‍♀️"
     CompanionMood.SAD -> "🙍‍♀️"
-    CompanionMood.BORED -> "🧍‍♀️"
-    CompanionMood.INTERESTED -> "💁‍♀️"
     CompanionMood.HAPPY -> "🙆‍♀️"
     CompanionMood.CELEBRATING -> "💃"
+    CompanionMood.PRAISE -> "👍"
 }
 
 private fun captionFor(mood: CompanionMood): Int = when (mood) {
+    CompanionMood.NEUTRAL -> R.string.companion_neutral
+    CompanionMood.WAITING -> R.string.companion_waiting
     CompanionMood.SAD -> R.string.companion_sad
-    CompanionMood.BORED -> R.string.companion_bored
-    CompanionMood.INTERESTED -> R.string.companion_interested
     CompanionMood.HAPPY -> R.string.companion_happy
     CompanionMood.CELEBRATING -> R.string.companion_celebrating
+    CompanionMood.PRAISE -> R.string.companion_praise
 }

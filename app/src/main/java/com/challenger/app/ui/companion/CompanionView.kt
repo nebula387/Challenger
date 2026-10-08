@@ -1,6 +1,7 @@
 package com.challenger.app.ui.companion
 
 import android.graphics.BitmapFactory
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -59,12 +60,19 @@ fun Companion(
         modifier = modifier.alpha(settings.opacity),
         contentAlignment = Alignment.BottomCenter
     ) {
-        val path = asset
-        when {
-            path == null -> PlaceholderCompanion(mood, Modifier.fillMaxSize())
-            path.endsWith(".json", ignoreCase = true) ->
-                LottieCompanion(path, mood, settings.fullScreen)
-            else -> ImageCompanion(path, mood, settings.fullScreen)
+        // Смена настроения — это смена картинки, поэтому переход плавный,
+        // иначе «класс» после отметки выглядит как подёргивание.
+        Crossfade(
+            targetState = asset to mood,
+            animationSpec = tween(350),
+            label = "companion"
+        ) { (path, current) ->
+            when {
+                path == null -> PlaceholderCompanion(current, Modifier.fillMaxSize())
+                path.endsWith(".json", ignoreCase = true) ->
+                    LottieCompanion(path, current, settings.fullScreen)
+                else -> ImageCompanion(path, current, settings.fullScreen)
+            }
         }
     }
 }

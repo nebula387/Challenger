@@ -27,12 +27,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.challenger.app.R
+import com.challenger.app.domain.CompanionMood
 import com.challenger.app.ui.companion.Companion
 import com.challenger.app.ui.components.ChallengeCard
 import com.challenger.app.ui.components.scheduleSummary
+import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -46,10 +52,22 @@ fun TodayScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val companion by viewModel.companionSettings.collectAsStateWithLifecycle()
 
+    // Отметил дело — спутница на пару секунд показывает «класс» и возвращается
+    // к обычному настроению. Это и есть вся награда за галочку.
+    var praising by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        viewModel.praise.collect {
+            praising = true
+            delay(PRAISE_MILLIS)
+            praising = false
+        }
+    }
+    val mood = if (praising) CompanionMood.PRAISE else state.mood
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Спутница живёт на фоне: карточки со своим фоном ложатся поверх неё.
         Companion(
-            mood = state.mood,
+            mood = mood,
             settings = companion,
             modifier = if (companion.fullScreen) {
                 Modifier.matchParentSize()
@@ -216,3 +234,6 @@ private fun EmptyToday(onAddChallenge: () -> Unit) {
         Button(onClick = onAddChallenge) { Text(stringResource(R.string.today_pick_challenge)) }
     }
 }
+
+/** Сколько держится реакция «класс» после отметки. */
+private const val PRAISE_MILLIS = 2500L

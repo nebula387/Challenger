@@ -155,8 +155,9 @@
     <string name="widget_empty">Nothing planned for today</string>
     <!-- Companion -->
     <string name="companion_sad">The day is slipping away. Shall we start?</string>
-    <string name="companion_bored">Waiting for you to begin</string>
-    <string name="companion_interested">That is better. Keep going</string>
+    <string name="companion_neutral">A new day. Nothing is due yet</string>
+    <string name="companion_waiting">Waiting for you to begin</string>
+    <string name="companion_praise">That is the way</string>
     <string name="companion_happy">Everything that matters is done. Nice work</string>
     <string name="companion_celebrating">The whole day is closed. Time to dance</string>
 

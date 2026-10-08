@@ -1,10 +1,19 @@
 {
   "name": "Ann",
   "frames": {
-    "SAD": "sad.webp",
-    "BORED": "idle.webp",
-    "INTERESTED": "smile.webp",
-    "HAPPY": "happy.webp",
-    "CELEBRATING": "dance.webp"
+    "NEUTRAL": "full/neutral.webp",
+    "WAITING": "full/waiting.webp",
+    "SAD": "full/sad.webp",
+    "HAPPY": "full/happy.webp",
+    "CELEBRATING": "full/celebrating.webp",
+    "PRAISE": "full/praise.webp"
+  },
+  "faces": {
+    "NEUTRAL": "face/neutral.webp",
+    "WAITING": "face/waiting.webp",
+    "SAD": "face/sad.webp",
+    "HAPPY": "face/happy.webp",
+    "CELEBRATING": "face/celebrating.webp",
+    "PRAISE": "face/praise.webp"
   }
 }
