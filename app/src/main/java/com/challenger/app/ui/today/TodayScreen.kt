@@ -1,8 +1,10 @@
 package com.challenger.app.ui.today
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,9 +14,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +48,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.challenger.app.R
 import com.challenger.app.domain.CompanionMood
+import com.challenger.app.domain.TodayStatus
+import com.challenger.app.ui.theme.LocalIsDark
+import com.challenger.app.ui.theme.color
 import com.challenger.app.ui.companion.Companion
 import com.challenger.app.ui.components.ChallengeCard
 import com.challenger.app.ui.components.scheduleSummary
@@ -105,38 +121,72 @@ fun TodayScreen(
         // сверху вниз, так список читается привычнее.
         val bottomAnchored = companion.enabled && companion.fullScreen
 
+        // Сделанное из списка уходит: место в кадре дороже, чем перечёркнутая
+        // строка. Остаётся счётчик, по нему всегда можно развернуть и посмотреть.
+        val mustLeft = state.must.filterNot { it.isDone }
+        val restLeft = state.rest.filterNot { it.isDone }
+        val doneRows = state.all.filter { it.isDone }
+        var showDone by remember { mutableStateOf(false) }
+
         Column(modifier = Modifier.fillMaxSize()) {
             // Дата и прогресс закреплены сверху и со списком не уезжают.
             Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
                 DayHeader(state)
             }
 
-            LazyColumn(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
-                verticalArrangement = if (bottomAnchored) {
-                    Arrangement.spacedBy(10.dp, Alignment.Bottom)
-                } else {
-                    Arrangement.spacedBy(10.dp)
-                }
+                    .weight(1f)
             ) {
-                if (!state.loading && state.total == 0) {
-                    item { EmptyToday(onAddChallenge) }
-                }
+                // Как только список грозит дорасти до лица, карточки ужимаются вдвое.
+                val visibleRows = mustLeft.size + restLeft.size +
+                    if (showDone) doneRows.size else 0
+                val sections = listOf(mustLeft, restLeft).count { it.isNotEmpty() }
+                val needed = FULL_ROW * visibleRows + SECTION_ROW * sections +
+                    if (doneRows.isEmpty()) 0.dp else SECTION_ROW
+                val compact = bottomAnchored && needed > maxHeight * FACE_HEADROOM
 
-                if (state.must.isNotEmpty()) {
-                    item { SectionTitle(stringResource(R.string.today_section_must)) }
-                    items(state.must, key = { it.challenge.id }) { row ->
-                        TodayCard(row, viewModel, onOpenChallenge)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                    verticalArrangement = if (bottomAnchored) {
+                        Arrangement.spacedBy(10.dp, Alignment.Bottom)
+                    } else {
+                        Arrangement.spacedBy(10.dp)
                     }
-                }
+                ) {
+                    if (!state.loading && state.total == 0) {
+                        item { EmptyToday(onAddChallenge) }
+                    }
 
-                if (state.rest.isNotEmpty()) {
-                    item { SectionTitle(stringResource(R.string.today_section_rest)) }
-                    items(state.rest, key = { it.challenge.id }) { row ->
-                        TodayCard(row, viewModel, onOpenChallenge)
+                    if (doneRows.isNotEmpty()) {
+                        item(key = "done_summary") {
+                            DoneSummary(
+                                count = doneRows.size,
+                                expanded = showDone,
+                                onClick = { showDone = !showDone }
+                            )
+                        }
+                        if (showDone) {
+                            items(doneRows, key = { "done_" + it.challenge.id }) { row ->
+                                TodayCard(row, viewModel, onOpenChallenge, compact = true)
+                            }
+                        }
+                    }
+
+                    if (mustLeft.isNotEmpty()) {
+                        item { SectionTitle(stringResource(R.string.today_section_must)) }
+                        items(mustLeft, key = { it.challenge.id }) { row ->
+                            TodayCard(row, viewModel, onOpenChallenge, compact)
+                        }
+                    }
+
+                    if (restLeft.isNotEmpty()) {
+                        item { SectionTitle(stringResource(R.string.today_section_rest)) }
+                        items(restLeft, key = { it.challenge.id }) { row ->
+                            TodayCard(row, viewModel, onOpenChallenge, compact)
+                        }
                     }
                 }
             }
@@ -144,11 +194,57 @@ fun TodayScreen(
     }
 }
 
+/** Свёрнутая строка выполненного: галочка, счётчик и разворот по нажатию. */
+@Composable
+private fun DoneSummary(count: Int, expanded: Boolean, onClick: () -> Unit) {
+    val dark = LocalIsDark.current
+    val green = TodayStatus.DONE.color(dark)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            // Та же подложка, что у карточек: без неё счётчик теряется на картинке.
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(26.dp)
+                .clip(CircleShape)
+                .background(green),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Spacer(Modifier.width(10.dp))
+        Text(
+            text = stringResource(R.string.today_done_count, count),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 @Composable
 private fun TodayCard(
     row: TodayRow,
     viewModel: TodayViewModel,
-    onOpenChallenge: (Long) -> Unit
+    onOpenChallenge: (Long) -> Unit,
+    compact: Boolean = false
 ) {
     val challenge = row.challenge
     val context = LocalContext.current
@@ -171,7 +267,8 @@ private fun TodayCard(
         subtitle = goal + scheduleSummary(context, challenge) + progress,
         streak = row.streak,
         onToggle = { viewModel.toggle(challenge.id) },
-        onClick = { onOpenChallenge(challenge.id) }
+        onClick = { onOpenChallenge(challenge.id) },
+        compact = compact
     )
 }
 
@@ -251,3 +348,10 @@ private fun EmptyToday(onAddChallenge: () -> Unit) {
 
 /** Сколько держится реакция «класс» после отметки. */
 private const val PRAISE_MILLIS = 2500L
+
+/** Оценка высоты строки списка: обычная карточка и заголовок раздела. */
+private val FULL_ROW = 86.dp
+private val SECTION_ROW = 34.dp
+
+/** Какую долю свободной высоты можно занять, не доходя до лица спутницы. */
+private const val FACE_HEADROOM = 0.62f

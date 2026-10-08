@@ -160,6 +160,7 @@
     <string name="settings_followup_hint">Закрыть напоминание и забыть поставить галочку — обычное дело. Приложение напомнит снова через это время, до вечера.</string>
     <string name="settings_followup_off">Выкл.</string>
     <string name="settings_followup_hours">%d ч</string>
+    <string name="today_done_count">Выполнено: %d</string>
 </resources>
 
 

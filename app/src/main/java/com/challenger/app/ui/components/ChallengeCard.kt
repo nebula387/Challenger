@@ -37,9 +37,19 @@ import com.challenger.app.domain.TodayStatus
 import com.challenger.app.ui.theme.LocalIsDark
 import com.challenger.app.ui.theme.color
 
+/** Высота карточки: компактная ровно вдвое ниже обычной. */
+private val FULL_HEIGHT = 76.dp
+private val COMPACT_HEIGHT = 38.dp
+
+/** Карточки лежат поверх спутницы, поэтому фон приглушённый, а не сплошной. */
+private const val CARD_ALPHA = 0.72f
+
 /**
  * Карточка челленджа. Большой круг слева — основная кнопка дня:
  * одно касание отмечает выполнение, и напоминание на сегодня пропадает.
+ *
+ * В [compact] виде остаётся только название: строка с целью и графиком уходит,
+ * высота падает вдвое. Так список дольше не доползает до лица спутницы.
  */
 @Composable
 fun ChallengeCard(
@@ -49,7 +59,8 @@ fun ChallengeCard(
     streak: Int,
     onToggle: () -> Unit,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     val dark = LocalIsDark.current
     val accent = status.color(dark)
@@ -59,11 +70,9 @@ fun ChallengeCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = if (done) {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                alpha = if (done) CARD_ALPHA * 0.7f else CARD_ALPHA
+            )
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -72,25 +81,34 @@ fun ChallengeCard(
             Box(
                 modifier = Modifier
                     .width(5.dp)
-                    .height(76.dp)
+                    .height(if (compact) COMPACT_HEIGHT else FULL_HEIGHT)
                     .background(accent)
             )
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(if (compact) 8.dp else 12.dp))
 
-            CheckCircle(checked = done, accent = accent, onToggle = onToggle)
+            CheckCircle(
+                checked = done,
+                accent = accent,
+                compact = compact,
+                onToggle = onToggle
+            )
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(if (compact) 8.dp else 12.dp))
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 14.dp),
+                    .padding(vertical = if (compact) 4.dp else 14.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
                     text = challenge.emoji + "  " + challenge.title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = if (compact) {
+                        MaterialTheme.typography.bodyMedium
+                    } else {
+                        MaterialTheme.typography.titleMedium
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textDecoration = if (done) TextDecoration.LineThrough else null,
@@ -100,13 +118,15 @@ fun ChallengeCard(
                         MaterialTheme.colorScheme.onSurface
                     }
                 )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (!compact) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             if (streak > 0) {
@@ -124,10 +144,15 @@ fun ChallengeCard(
 }
 
 @Composable
-private fun CheckCircle(checked: Boolean, accent: Color, onToggle: () -> Unit) {
+private fun CheckCircle(
+    checked: Boolean,
+    accent: Color,
+    compact: Boolean,
+    onToggle: () -> Unit
+) {
     Box(
         modifier = Modifier
-            .size(40.dp)
+            .size(if (compact) 30.dp else 40.dp)
             .clip(CircleShape)
             .background(if (checked) accent else Color.Transparent)
             .clickable(onClick = onToggle),
@@ -137,12 +162,13 @@ private fun CheckCircle(checked: Boolean, accent: Color, onToggle: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = stringResource(R.string.done_mark),
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.size(if (compact) 18.dp else 24.dp)
             )
         } else {
             Box(
                 modifier = Modifier
-                    .size(26.dp)
+                    .size(if (compact) 20.dp else 26.dp)
                     .clip(CircleShape)
                     .background(accent.copy(alpha = 0.18f))
             )
