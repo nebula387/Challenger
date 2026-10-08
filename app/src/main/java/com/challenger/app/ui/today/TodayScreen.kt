@@ -100,32 +100,46 @@ fun TodayScreen(
             )
         }
 
-        LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        item { DayHeader(state) }
+        // Со спутницей во весь экран карточки прижаты к низу: тогда они накрывают
+        // её с ног, а лицо освобождается последним. Без неё — обычный порядок
+        // сверху вниз, так список читается привычнее.
+        val bottomAnchored = companion.enabled && companion.fullScreen
 
-        if (!state.loading && state.total == 0) {
-            item { EmptyToday(onAddChallenge) }
-        }
-
-        if (state.must.isNotEmpty()) {
-            item { SectionTitle(stringResource(R.string.today_section_must)) }
-            items(state.must, key = { it.challenge.id }) { row ->
-                TodayCard(row, viewModel, onOpenChallenge)
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Дата и прогресс закреплены сверху и со списком не уезжают.
+            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+                DayHeader(state)
             }
-        }
 
-        if (state.rest.isNotEmpty()) {
-            item { SectionTitle(stringResource(R.string.today_section_rest)) }
-            items(state.rest, key = { it.challenge.id }) { row ->
-                TodayCard(row, viewModel, onOpenChallenge)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                verticalArrangement = if (bottomAnchored) {
+                    Arrangement.spacedBy(10.dp, Alignment.Bottom)
+                } else {
+                    Arrangement.spacedBy(10.dp)
+                }
+            ) {
+                if (!state.loading && state.total == 0) {
+                    item { EmptyToday(onAddChallenge) }
+                }
+
+                if (state.must.isNotEmpty()) {
+                    item { SectionTitle(stringResource(R.string.today_section_must)) }
+                    items(state.must, key = { it.challenge.id }) { row ->
+                        TodayCard(row, viewModel, onOpenChallenge)
+                    }
+                }
+
+                if (state.rest.isNotEmpty()) {
+                    item { SectionTitle(stringResource(R.string.today_section_rest)) }
+                    items(state.rest, key = { it.challenge.id }) { row ->
+                        TodayCard(row, viewModel, onOpenChallenge)
+                    }
+                }
             }
-        }
-
-        item { Spacer(Modifier.height(24.dp)) }
         }
     }
 }
