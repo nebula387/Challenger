@@ -90,7 +90,7 @@ private fun LottieCompanion(assetPath: String, mood: CompanionMood, fullScreen: 
     LottieAnimation(
         composition = composition,
         progress = { progress },
-        contentScale = if (fullScreen) ContentScale.Crop else ContentScale.Fit,
+        contentScale = if (fullScreen) ContentScale.FillWidth else ContentScale.Fit,
         alignment = Alignment.BottomCenter,
         modifier = Modifier.fillMaxSize()
     )
@@ -125,9 +125,9 @@ private fun ImageCompanion(assetPath: String, mood: CompanionMood, fullScreen: B
     Image(
         bitmap = image,
         contentDescription = null,
-        // Во весь экран кадр обрезается по краям, но ноги остаются внизу,
-        // поэтому фигура не «висит» в воздухе.
-        contentScale = if (fullScreen) ContentScale.Crop else ContentScale.Fit,
+        // Во весь экран растягиваем по ширине и прижимаем к низу. Crop обрезал бы
+        // бока и увеличивал сильнее, а запас сверху как раз уходит под заголовок.
+        contentScale = if (fullScreen) ContentScale.FillWidth else ContentScale.Fit,
         alignment = Alignment.BottomCenter,
         modifier = Modifier
             .fillMaxSize()
