@@ -134,7 +134,7 @@
     <string name="channel_normal_desc">Напоминания, которые не критично пропустить</string>
     <string name="notif_goal">Цель: %1$d %2$s</string>
     <string name="notif_time_to">Пора сделать</string>
-    <string name="notif_must_prefix">Обязательно. </string>
+    <string name="notif_must_prefix">Обязательно.</string>
     <string name="notif_action_done">Выполнил</string>
     <string name="notif_action_snooze">Через час</string>
 

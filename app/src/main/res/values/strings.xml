@@ -146,7 +146,7 @@
     <string name="channel_normal_desc">Reminders it is fine to miss</string>
     <string name="notif_goal">Goal: %1$d %2$s</string>
     <string name="notif_time_to">Time to do it</string>
-    <string name="notif_must_prefix">Must do. </string>
+    <string name="notif_must_prefix">Must do.</string>
     <string name="notif_action_done">Done</string>
     <string name="notif_action_snooze">In an hour</string>
 

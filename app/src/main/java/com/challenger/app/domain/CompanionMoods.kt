@@ -24,7 +24,7 @@ enum class CompanionMood {
     val isPositive: Boolean get() = this >= HAPPY
 }
 
-object Companion {
+object CompanionMoods {
 
     /**
      * Настроение растёт постепенно: чем больше закрыто, тем она довольнее.

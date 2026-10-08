@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.challenger.app.data.repo.ChallengeRepository
 import com.challenger.app.domain.Schedule
+import com.challenger.app.ui.companion.CompanionFaces
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,7 +49,8 @@ class ReminderReceiver : BroadcastReceiver() {
         // Пока будильник ждал, день мог быть отмечен или челлендж отредактирован.
         val alreadyDone = repo.doneDates(challengeId).contains(today)
         if (!alreadyDone && Schedule.isActiveOn(challenge, today)) {
-            Notifications.showReminder(context, challenge)
+            val face = CompanionFaces.load(context, repo.todayMood(), FACE_PX)
+            Notifications.showReminder(context, challenge, face)
         }
         ReminderScheduler.rescheduleOne(context, challengeId)
     }
@@ -76,6 +78,9 @@ class ReminderReceiver : BroadcastReceiver() {
         const val EXTRA_CHALLENGE_ID = "challenge_id"
 
         private const val SNOOZE_MINUTES = 60L
+
+        /** Крупная иконка уведомления: системе хватает примерно такого размера. */
+        private const val FACE_PX = 192
 
         fun requestCodeDone(challengeId: Long): Int = 200_000 + challengeId.toInt()
         fun requestCodeSnooze(challengeId: Long): Int = 300_000 + challengeId.toInt()

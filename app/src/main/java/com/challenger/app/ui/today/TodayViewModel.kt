@@ -8,7 +8,7 @@ import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Priority
 import com.challenger.app.data.prefs.CompanionSettings
 import com.challenger.app.data.prefs.ReminderPrefs
-import com.challenger.app.domain.Companion
+import com.challenger.app.domain.CompanionMoods
 import com.challenger.app.domain.CompanionMood
 import com.challenger.app.domain.Schedule
 import com.challenger.app.domain.Stats
@@ -104,7 +104,7 @@ class TodayViewModel(app: Application) : AndroidViewModel(app) {
                 rest = rows.filter { it.challenge.priority != Priority.MUST }
                     .sortedWith(compareBy({ it.isDone }, { it.challenge.priority.ordinal })),
                 loading = false,
-                mood = Companion.moodFor(
+                mood = CompanionMoods.moodFor(
                     doneCount = doneCount,
                     total = rows.size,
                     mustLeft = mustLeft,

@@ -1,6 +1,6 @@
 package com.challenger.app
 
-import com.challenger.app.domain.Companion
+import com.challenger.app.domain.CompanionMoods
 import com.challenger.app.domain.CompanionMood
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,13 +17,13 @@ class CompanionMoodTest {
         mustLeft: Int,
         now: LocalTime,
         sadAfter: Int = 3
-    ) = Companion.moodFor(done, total, mustLeft, reminder, now, sadAfter)
+    ) = CompanionMoods.moodFor(done, total, mustLeft, reminder, now, sadAfter)
 
     @Test
     fun `в выходной по графику спутница спокойна`() {
         assertEquals(
             CompanionMood.NEUTRAL,
-            Companion.moodFor(0, 0, 0, null, LocalTime.of(15, 0), 3)
+            CompanionMoods.moodFor(0, 0, 0, null, LocalTime.of(15, 0), 3)
         )
     }
 
@@ -71,7 +71,7 @@ class CompanionMoodTest {
 
     @Test
     fun `позднее напоминание не делает грусть из-за перехода через полночь`() {
-        val late = Companion.moodFor(
+        val late = CompanionMoods.moodFor(
             doneCount = 0, total = 1, mustLeft = 1,
             firstReminder = LocalTime.of(23, 0), now = LocalTime.of(23, 30), sadAfterHours = 3
         )

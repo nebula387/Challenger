@@ -4,7 +4,11 @@ import android.content.Context
 import com.challenger.app.data.db.ChallengerDatabase
 import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Completion
+import com.challenger.app.data.model.Priority
+import com.challenger.app.data.prefs.ReminderPrefs
 import com.challenger.app.domain.ChallengeStats
+import com.challenger.app.domain.CompanionMood
+import com.challenger.app.domain.CompanionMoods
 import com.challenger.app.domain.Schedule
 import com.challenger.app.domain.Stats
 import com.challenger.app.notify.ReminderScheduler
@@ -13,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * Единая точка входа к данным. Любое изменение здесь же пересобирает будильники
@@ -113,6 +118,22 @@ class ChallengeRepository(
         return challenges.getActive()
             .filter { Schedule.isActiveOn(it, date) }
             .map { TodayItem(it, done[it.id]) }
+    }
+
+    /**
+     * Настроение спутницы по снимку дня. Виджет и шторка считают его отсюда,
+     * чтобы не разойтись с экраном «Сегодня».
+     */
+    suspend fun todayMood(now: LocalTime = LocalTime.now()): CompanionMood {
+        val items = todaySnapshot()
+        return CompanionMoods.moodFor(
+            doneCount = items.count { it.isDone },
+            total = items.size,
+            mustLeft = items.count { it.challenge.priority == Priority.MUST && !it.isDone },
+            firstReminder = items.flatMap { it.challenge.reminderTimes }.minOrNull(),
+            now = now,
+            sadAfterHours = ReminderPrefs(context).currentFollowUpHours()
+        )
     }
 
     /** Даты, за которые челлендж уже отмечен, для планировщика напоминаний. */

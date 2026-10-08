@@ -26,7 +26,8 @@ data class CompanionPack(
     val id: String,
     val name: String,
     val options: Map<String, List<String>>,
-    private val frames: Map<CompanionMood, String>
+    private val frames: Map<CompanionMood, String>,
+    private val faces: Map<CompanionMood, String> = emptyMap()
 ) {
     /**
      * Путь к файлу для настроения с учётом выбранных вариантов.
@@ -37,8 +38,25 @@ data class CompanionPack(
         context: Context,
         mood: CompanionMood,
         selected: Map<String, String>
+    ): String? = resolve(context, frames, mood, selected)
+
+    /**
+     * Портрет для виджета и шторки. Там фигура в полный рост не читается,
+     * нужен крупный план. Пака без лиц это не ломает — вернётся null.
+     */
+    fun faceFor(
+        context: Context,
+        mood: CompanionMood,
+        selected: Map<String, String> = emptyMap()
+    ): String? = resolve(context, faces, mood, selected)
+
+    private fun resolve(
+        context: Context,
+        templates: Map<CompanionMood, String>,
+        mood: CompanionMood,
+        selected: Map<String, String>
     ): String? {
-        val template = frames[mood] ?: frames[fallbackMood(mood)] ?: return null
+        val template = templates[mood] ?: templates[fallbackMood(mood)] ?: return null
 
         val filled = template.replace(PLACEHOLDER) { match ->
             val key = match.groupValues[1]
@@ -117,17 +135,19 @@ object CompanionPacks {
             }
         }.orEmpty()
 
-        val frames = root.optJSONObject("frames")?.let { obj ->
-            CompanionMood.entries.mapNotNull { mood ->
-                obj.optString(mood.name).takeIf { it.isNotBlank() }?.let { mood to it }
-            }.toMap()
-        }.orEmpty()
+        fun moodMap(key: String): Map<CompanionMood, String> =
+            root.optJSONObject(key)?.let { obj ->
+                CompanionMood.entries.mapNotNull { mood ->
+                    obj.optString(mood.name).takeIf { it.isNotBlank() }?.let { mood to it }
+                }.toMap()
+            }.orEmpty()
 
         CompanionPack(
             id = id,
             name = root.optString("name", id),
             options = options,
-            frames = frames
+            frames = moodMap("frames"),
+            faces = moodMap("faces")
         )
     }.getOrNull()
 }

@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -46,7 +47,7 @@ object Notifications {
      * Уведомление с кнопкой «Выполнил»: отметить можно прямо из шторки,
      * не открывая приложение.
      */
-    fun showReminder(context: Context, challenge: Challenge) {
+    fun showReminder(context: Context, challenge: Challenge, face: Bitmap? = null) {
         ensureChannels(context)
 
         val channel = if (challenge.priority == Priority.MUST) CHANNEL_MUST else CHANNEL_NORMAL
@@ -85,21 +86,24 @@ object Notifications {
         } else {
             context.getString(R.string.notif_time_to)
         }
-        val prefix = if (challenge.priority == Priority.MUST) {
-            context.getString(R.string.notif_must_prefix)
+        // Пробел ставим здесь: в strings.xml хвостовой пробел всё равно срезается.
+        val text = if (challenge.priority == Priority.MUST) {
+            context.getString(R.string.notif_must_prefix) + " " + goal
         } else {
-            ""
+            goal
         }
 
         val notification = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(challenge.emoji + " " + challenge.title)
-            .setContentText(prefix + goal)
+            .setContentText(text)
             .setPriority(
                 if (challenge.priority == Priority.MUST) NotificationCompat.PRIORITY_HIGH
                 else NotificationCompat.PRIORITY_DEFAULT
             )
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            // Лицо в шторке: напоминание смотрит на тебя, а не просто лежит.
+            .setLargeIcon(face)
             .setContentIntent(openApp)
             .setAutoCancel(true)
             .addAction(0, context.getString(R.string.notif_action_done), markDone)
