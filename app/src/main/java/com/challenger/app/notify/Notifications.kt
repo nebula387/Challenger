@@ -5,21 +5,28 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.challenger.app.MainActivity
 import com.challenger.app.R
 import com.challenger.app.data.model.Challenge
 import com.challenger.app.data.model.Priority
 import com.challenger.app.domain.Digest
+import com.challenger.app.ui.companion.CompanionFaces
 
 object Notifications {
 
     const val CHANNEL_MUST = "reminders_must"
     const val CHANNEL_NORMAL = "reminders_normal"
     const val CHANNEL_DIGEST = "daily_digest"
+
+    private const val TAG = "Notifications"
+    private const val SHORTCUT_ID = "companion"
 
     /** Не пересекается с id челленджей: те растут с единицы. */
     private const val DIGEST_ID = Int.MAX_VALUE - 1
@@ -63,7 +70,11 @@ object Notifications {
      * Картина дня одним уведомлением: каждое дело своей строкой, обязательные
      * сверху. Сворачивается в заголовок, разворачивается в список.
      */
-    fun showDigest(context: Context, challenges: List<Challenge>, face: Bitmap?) {
+    fun showDigest(
+        context: Context,
+        challenges: List<Challenge>,
+        portrait: CompanionFaces.Portrait?
+    ) {
         ensureChannels(context)
         val ordered = Digest.ordered(challenges)
         val mustCount = ordered.count { it.priority == Priority.MUST }
@@ -89,16 +100,21 @@ object Notifications {
         ordered.forEach { style.addLine(digestLine(it)) }
         summary?.let(style::setSummaryText)
 
+        val message = buildString {
+            append(title)
+            ordered.forEach { append('\n').append(digestLine(it)) }
+        }
+
         val notification = NotificationCompat.Builder(context, CHANNEL_DIGEST)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             // В свёрнутом виде видно, с чего начать.
             .setContentText(ordered.take(3).joinToString(", ") { it.title })
             .setStyle(style)
-            .setLargeIcon(face)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setContentIntent(openApp)
             .setAutoCancel(true)
+            .asMessageFrom(context, portrait, message)
             .build()
 
         runCatching { NotificationManagerCompat.from(context).notify(DIGEST_ID, notification) }
@@ -117,7 +133,11 @@ object Notifications {
      * Уведомление с кнопкой «Выполнил»: отметить можно прямо из шторки,
      * не открывая приложение.
      */
-    fun showReminder(context: Context, challenge: Challenge, face: Bitmap? = null) {
+    fun showReminder(
+        context: Context,
+        challenge: Challenge,
+        portrait: CompanionFaces.Portrait? = null
+    ) {
         ensureChannels(context)
 
         val channel = if (challenge.priority == Priority.MUST) CHANNEL_MUST else CHANNEL_NORMAL
@@ -172,18 +192,69 @@ object Notifications {
                 else NotificationCompat.PRIORITY_DEFAULT
             )
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            // Лицо в шторке: напоминание смотрит на тебя, а не просто лежит.
-            .setLargeIcon(face)
             .setContentIntent(openApp)
             .setAutoCancel(true)
             .addAction(0, context.getString(R.string.notif_action_done), markDone)
             .addAction(0, context.getString(R.string.notif_action_snooze), snooze)
+            .asMessageFrom(context, portrait, challenge.emoji + " " + challenge.title + "\n" + text)
             .build()
 
         runCatching {
             NotificationManagerCompat.from(context).notify(id, notification)
         }
     }
+
+    /**
+     * Делает уведомление сообщением от неё. Только у переписок Android рисует
+     * слева крупный аватар вместо значка приложения — значок остаётся маленьким
+     * бейджем на лице. Для этого нужны стиль переписки и долгоживущий ярлык
+     * с её портретом. Без портрета уведомление остаётся обычным.
+     */
+    private fun NotificationCompat.Builder.asMessageFrom(
+        context: Context,
+        portrait: CompanionFaces.Portrait?,
+        text: CharSequence
+    ): NotificationCompat.Builder {
+        if (portrait == null) return this
+
+        val icon = IconCompat.createWithBitmap(portrait.face)
+        val her = Person.Builder()
+            .setKey(SHORTCUT_ID)
+            .setName(portrait.name)
+            .setIcon(icon)
+            .setImportant(true)
+            .build()
+
+        // Если ярлык не встал, переписка без него показалась бы обычным
+        // уведомлением без лица вовсе — тогда хотя бы кладём лицо справа.
+        if (!publishShortcut(context, her, icon)) return setLargeIcon(portrait.face)
+
+        val me = Person.Builder().setName(context.getString(R.string.notif_me)).build()
+        return setShortcutId(SHORTCUT_ID)
+            .setStyle(
+                NotificationCompat.MessagingStyle(me)
+                    .addMessage(text, System.currentTimeMillis(), her)
+            )
+    }
+
+    /** Ярлык обновляется перед каждым показом: лицо на нём — сегодняшнее. */
+    private fun publishShortcut(context: Context, her: Person, icon: IconCompat): Boolean =
+        runCatching {
+            val shortcut = ShortcutInfoCompat.Builder(context, SHORTCUT_ID)
+                .setShortLabel(her.name ?: context.getString(R.string.app_name))
+                .setLongLived(true)
+                .setPerson(her)
+                .setIcon(icon)
+                .setIntent(
+                    Intent(context, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
+                )
+                .build()
+            ShortcutManagerCompat.pushDynamicShortcut(context, shortcut)
+            true
+        }.getOrElse {
+            Log.w(TAG, "Ярлык спутницы не опубликован", it)
+            false
+        }
 
     fun cancel(context: Context, challengeId: Long) {
         NotificationManagerCompat.from(context).cancel(challengeId.toInt())

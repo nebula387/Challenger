@@ -83,6 +83,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     ) {
         Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineSmall)
 
+        LanguageCard()
+
         SettingCard(
             title = stringResource(R.string.settings_notifications),
             status = stringResource(

@@ -13,6 +13,7 @@ import com.challenger.app.domain.CompanionMoods
 import com.challenger.app.domain.FrozenDays
 import com.challenger.app.domain.Schedule
 import com.challenger.app.domain.Stats
+import com.challenger.app.notify.Notifications
 import com.challenger.app.notify.ReminderScheduler
 import com.challenger.app.widget.TodayWidget
 import kotlinx.coroutines.flow.Flow
@@ -160,6 +161,8 @@ class ChallengeRepository(
             completions.upsert(
                 Completion(challengeId, date, value = if (value > 0) value else target)
             )
+            // Напоминание могло уже висеть в шторке — сделанное дело не должно о себе напоминать.
+            Notifications.cancel(context, challengeId)
         } else {
             completions.remove(challengeId, date)
         }
@@ -171,6 +174,7 @@ class ChallengeRepository(
         if (done) {
             val target = challenges.getById(challengeId)?.targetValue ?: 0
             completions.upsert(Completion(challengeId, date, value = target))
+            Notifications.cancel(context, challengeId)
         } else {
             completions.remove(challengeId, date)
         }

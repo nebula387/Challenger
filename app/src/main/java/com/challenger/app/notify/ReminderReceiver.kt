@@ -49,8 +49,8 @@ class ReminderReceiver : BroadcastReceiver() {
         // Пока будильник ждал, день мог быть отмечен или челлендж отредактирован.
         val alreadyDone = repo.doneDates(challengeId).contains(today)
         if (!alreadyDone && Schedule.isActiveOn(challenge, today)) {
-            val face = CompanionFaces.load(context, repo.todayMood(), FACE_PX)
-            Notifications.showReminder(context, challenge, face)
+            val portrait = CompanionFaces.portrait(context, repo.todayMood(), FACE_PX)
+            Notifications.showReminder(context, challenge, portrait)
         }
         ReminderScheduler.rescheduleOne(context, challengeId)
     }

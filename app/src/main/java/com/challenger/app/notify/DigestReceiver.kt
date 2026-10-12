@@ -25,8 +25,8 @@ class DigestReceiver : BroadcastReceiver() {
                 // Снимок дня уже без пауз и архива, остаётся отбросить сделанное.
                 val left = repo.todaySnapshot().filterNot { it.isDone }.map { it.challenge }
                 if (left.isNotEmpty()) {
-                    val face = CompanionFaces.load(app, repo.todayMood(), FACE_PX)
-                    Notifications.showDigest(app, left, face)
+                    val portrait = CompanionFaces.portrait(app, repo.todayMood(), FACE_PX)
+                    Notifications.showDigest(app, left, portrait)
                 }
             } finally {
                 // Следующую сводку ставим в любом случае — иначе одна пропущенная

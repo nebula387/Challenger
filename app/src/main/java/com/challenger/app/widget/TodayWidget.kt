@@ -4,6 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -51,10 +54,19 @@ class TodayWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = ChallengeRepository(context)
-        val items = repository.todaySnapshot()
-        val face = CompanionFaces.load(context, repository.todayMood(), FACE_PX)
+        val initialItems = repository.todaySnapshot()
+        val initialFace = CompanionFaces.load(context, repository.todayMood(), FACE_PX)
 
         provideContent {
+            // Сессия виджета живёт долго, и снимок, сделанный при её старте,
+            // переставал обновляться: отметка в приложении не доходила, а отметка
+            // на виджете выглядела несработавшей — и второе нажатие её снимало.
+            // Поэтому данные идут потоком из базы.
+            val items by repository.observeToday().collectAsState(initialItems)
+            val face by produceState(initialFace, items) {
+                value = CompanionFaces.load(context, repository.todayMood(), FACE_PX)
+            }
+
             GlanceTheme {
                 WidgetBody(items, face)
             }

@@ -190,6 +190,10 @@
     <string name="settings_digest_hint">Все дела на день одним уведомлением, обязательные сверху. В дни паузы и когда всё уже сделано не приходит.</string>
     <string name="settings_digest_time">В %s</string>
     <string name="settings_digest_change">Изменить время</string>
+    <string name="notif_me">Вы</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_hint">Меняется только приложение, не телефон. Уже созданные челленджи сохранят свои названия.</string>
+    <string name="settings_language_system">Как в телефоне</string>
 </resources>
 
 

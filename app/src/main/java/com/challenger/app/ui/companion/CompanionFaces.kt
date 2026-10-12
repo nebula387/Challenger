@@ -22,7 +22,13 @@ object CompanionFaces {
 
     private const val TAG = "CompanionFaces"
 
+    /** Лицо и имя из пака — уведомлению-переписке нужно и то, и другое. */
+    data class Portrait(val name: String, val face: Bitmap)
+
     suspend fun load(context: Context, mood: CompanionMood, sizePx: Int): Bitmap? =
+        portrait(context, mood, sizePx)?.face
+
+    suspend fun portrait(context: Context, mood: CompanionMood, sizePx: Int): Portrait? =
         withContext(Dispatchers.IO) {
             val app = context.applicationContext
             val settings = CompanionPrefs(app).settings.first()
@@ -34,6 +40,7 @@ object CompanionFaces {
             runCatching { decodeScaled(app, path, sizePx) }
                 .onFailure { Log.w(TAG, "Не удалось прочитать лицо: $path", it) }
                 .getOrNull()
+                ?.let { Portrait(pack.name, it) }
         }
 
     private fun decodeScaled(context: Context, path: String, sizePx: Int): Bitmap? {

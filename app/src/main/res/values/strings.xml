@@ -202,6 +202,10 @@
     <string name="settings_digest_hint">Everything planned for the day in one notification, must-do first. Skipped on paused days and when nothing is left.</string>
     <string name="settings_digest_time">At %s</string>
     <string name="settings_digest_change">Change time</string>
+    <string name="notif_me">You</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_hint">Changes the app only, not the phone. Challenges you already created keep their names.</string>
+    <string name="settings_language_system">As on the phone</string>
 </resources>
 
 
