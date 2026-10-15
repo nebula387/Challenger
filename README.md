@@ -1,5 +1,22 @@
 # Challenger
 
+<table>
+  <tr>
+    <td align="center"><img src="Screen/so....jpg" width="170" alt="Today, nothing ticked off yet"></td>
+    <td align="center"><img src="Screen/well_done.jpg" width="170" alt="The whole day closed"></td>
+    <td align="center"><img src="Screen/reminder.jpg" width="170" alt="A reminder from the companion"></td>
+    <td align="center"><img src="Screen/vidjet.jpg" width="170" alt="Home screen widget"></td>
+    <td align="center"><img src="Screen/menu.jpg" width="170" alt="Challenges"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Waiting for the day to start</sub></td>
+    <td align="center"><sub>Everything done</sub></td>
+    <td align="center"><sub>A reminder from her</sub></td>
+    <td align="center"><sub>Widget</sub></td>
+    <td align="center"><sub>Challenges and streaks</sub></td>
+  </tr>
+</table>
+
 An Android app for personal challenges: set it up once, and it reminds you from
 then on. You can tick a challenge off without opening the app at all.
 

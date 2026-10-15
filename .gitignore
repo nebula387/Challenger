@@ -14,3 +14,6 @@ keystore/
 keystore.properties
 *.jks
 *.keystore
+
+# Оригиналы скриншотов до размытия личного — только локально
+Screen/_original/
